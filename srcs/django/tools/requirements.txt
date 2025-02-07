@@ -1,3 +1,5 @@
 Django
 djangorestframework
 djangorestframework-simplejwt
+gunicorn
+psycopg2
