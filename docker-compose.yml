@@ -1,0 +1,45 @@
+name: Transcendence
+
+service:
+  django:
+    build:
+      context: srcs/django
+      dockerfile: Dockerfile
+    environment:
+      - DB_PASS=${DB_PASS}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./srcs/django:/app
+    depends_on:
+      -postgres
+
+  postgres:
+    build:
+      context: srcs/postgres
+      dockerfile: Dockerfile
+      args:
+        - PSQL_PASS=${PSQL_PASS}
+        - DB_NAME=${DB_NAME}
+        - DB_USER=${DB_USER}
+        - DB_PASS=${DB_PASS}
+    environment:
+      - PSQL_PASS=${PSQL_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      -./srcs/postgres/data:/var/lib/postgresql/data
+
+  nginx:
+    build:
+      context: srcs/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+    depends_on:
+      - django
+    env_file:
+      - .env
