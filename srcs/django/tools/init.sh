@@ -21,8 +21,9 @@ echo "Migrating..."
 
 # 🔹 `app` のマイグレーションを適用
 python manage.py makemigrations api
-python manage.py migrate --fake-initial --noinput 
+python manage.py migrate --noinput 
 
 
 echo "🦄starting Django with Gunicorn..."
-exec gunicorn --bind 0.0.0.0:8000 backend.wsgi:application
+exec gunicorn --certfile=/etc/ssl/certs/django.crt --keyfile=/etc/ssl/certs/django.key \
+    --bind 0.0.0.0:8000 --forwarded-allow-ips="*" backend.wsgi:application

@@ -1,4 +1,4 @@
-name: Transcendence
+version: "3.8"
 
 services:
   django:

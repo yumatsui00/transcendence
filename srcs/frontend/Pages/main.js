@@ -27,7 +27,7 @@ document.getElementById('language').addEventListener('change', function() {
 });
 
 document.getElementById('signup').addEventListener('click', function() {
-    alert('Sign Up clicked');
+    window.location.href = '/signup'
 });
 
 document.getElementById('login').addEventListener('click', function() {

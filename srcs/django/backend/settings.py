@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+APPEND_SLASH = False
 load_dotenv()
 
 # Quick-start development settings - unsuitable for production
@@ -31,14 +32,15 @@ if not SECRET_KEY:
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django"]
 
-ALLOWED_HOSTS = []
+AUTH_USER_MODEL = 'api.CustomUser'
 
 # PostgreSQL の設定
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("POSTGRES_NAME"),
+        'NAME': os.getenv("POSTGRES_DB"),
         'USER': os.getenv("POSTGRES_USER"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
         'HOST': "POSTGRES",
@@ -143,4 +145,9 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True  # HTTPリクエストをHTTPSにリダイレクト
+CSRF_COOKIE_SECURE = True  # CSRF CookieをHTTPSのみで有効
+SESSION_COOKIE_SECURE = True  # セッションCookieをHTTPSのみで有効
 
