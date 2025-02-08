@@ -3,3 +3,4 @@ djangorestframework
 djangorestframework-simplejwt
 gunicorn
 psycopg2
+python-dotenv

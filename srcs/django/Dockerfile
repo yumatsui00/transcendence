@@ -16,7 +16,6 @@ RUN pip install --no-cache-dir -r ./tools/requirements.txt
 COPY	./tools/init.sh /entrypoint.sh
 RUN	chmod +x /entrypoint.sh
 
-COPY . .
 
 EXPOSE 8000
 
