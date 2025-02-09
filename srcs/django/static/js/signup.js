@@ -1,3 +1,12 @@
+
+document.getElementById("initimgBtn").addEventListener("click", function () {
+    // ✅ デフォルトの画像に戻す
+    document.getElementById("imagePreview").src = "/static/images/default.png";
+    // ✅ ファイル選択をクリア
+    document.getElementById("profile_image").value = "";
+});
+
+
 document.getElementById("signupBtn").addEventListener("click", async function () {
     const username = document.getElementById("username").value;
     const email = document.getElementById("email").value;
