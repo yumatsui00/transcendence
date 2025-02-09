@@ -1,6 +1,7 @@
 Django
 djangorestframework
 djangorestframework-simplejwt
+django-extensions
 gunicorn
 psycopg2
 python-dotenv

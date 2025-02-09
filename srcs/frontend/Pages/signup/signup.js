@@ -13,19 +13,20 @@ document.getElementById("signupBtn").addEventListener("click", async function ()
     }
 
     try {
-        const response = await fetch("https://localhost:8000/api/signup/", {
+        const response = await fetch("https://yumatsui.42.fr/api/signup/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password, language, color }),
-			credentials: "include", 
+            body: JSON.stringify({ username, email, password, language, color })
         });
+        // credentals: include を用いることでjwtの設定等も可能
 
         const data = await response.json();
         document.getElementById("message").textContent = data.message;
 
         if (data.success) {
             alert("Signup successful!");
-            window.location.href = "/login";  // 成功したらログインページへリダイレクト
+            console.log("🚀 Response:", data);
+            // window.location.href = "/login";  // 成功したらログインページへリダイレクト
         }
     } catch (error) {
         console.error("Error:", error);

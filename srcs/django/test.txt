@@ -1,0 +1,1 @@
+curl -X POST https://localhost:8000/api/signup/      -H "Content-Type: application/json"      -d '{"username": "testusdsedr", "email": "test@examdsdsple.com", "password": "tedst12d3", "language": 1, "color": 0}'      -k

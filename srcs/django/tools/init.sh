@@ -25,5 +25,12 @@ python manage.py migrate --noinput
 
 
 echo "🦄starting Django with Gunicorn..."
-exec gunicorn --certfile=/etc/ssl/certs/django.crt --keyfile=/etc/ssl/certs/django.key \
-    --bind 0.0.0.0:8000 --forwarded-allow-ips="*" backend.wsgi:application
+exec gunicorn \
+    --certfile=/etc/ssl/django/django.crt \
+    --keyfile=/etc/ssl/django/django.key \
+    --bind 0.0.0.0:8000 \
+    --workers 4 \
+    --access-logfile - \
+    --error-logfile - \
+    --timeout 120 \
+    backend.wsgi:application
