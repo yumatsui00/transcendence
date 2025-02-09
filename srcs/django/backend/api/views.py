@@ -5,6 +5,17 @@ from django.contrib.auth.hashers import make_password
 from .models import CustomUser
 from .utils import error_response, success_response
 import json
+from rest_framework_simplejwt.tokens import RefreshToken
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"message": "This is a protected page only for logged-in users!"})
 
 
 def index(request):
@@ -40,10 +51,27 @@ def signup_view(request):
 				language=language,
 				color=color
 			)
-			#migrateをしていたら、createだけでpostgresにユーザを登録可能
-			return success_response("User created successfully")
+
+			# jwttokenを発行
+			refresh = RefreshToken.for_user(user)
+			access_token = str(refresh.access_token)
+
+			#2FAを実行 (Google AuthenticatiorでQR登録)
+			device, created = TOTPDevice.objects.get_or_create(user=user, name="default")
+			otp_secret = device.key
+			qr = qrcode.make(f"otpauth://totp/{username}?secret={otp_secret}")
+			buffer = BytesIO()
+			qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+			return success_response("User created successfully", {
+				"access_token": access_token,
+				"refresh_token": str(refresh),
+				"qr_code": qr_base64  # QR コードをフロントで表示して Google Authenticator でスキャン
+			})
 
 		except Exception as e:
 			return error_response(str(e), status=500)
 
 	return error_response("Invalid request method", status=405)
+
+

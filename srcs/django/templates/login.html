@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in</title>
+    <link rel="stylesheet" href="st.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Log in</h1>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <select id="language">
+            <option value="0">English</option>
+            <option value="1">日本語</option>
+            <option value="2">Français</option>
+        </select>
+        <button id="signupBtn">Sign Up</button>
+        <p id="message"></p>
+    </div>
+    <script src="{% static 'js/login.js' %}"></script>
+</body>
+</html>

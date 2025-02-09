@@ -45,6 +45,7 @@ services:
       - .env
     volumes:
       - ./srcs/frontend:/usr/share/nginx/html
+      - ./srcs/django/staticfiles:/usr/share/nginx/html/static/
     networks:
       - TNet
 

@@ -15,8 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from .views import signup_view, login_view, protected_view, landing_page
 urlpatterns = [
+    path("", landing_page, name="landing"),
     path('admin/', admin.site.urls),
+    path('signup/', signup_view, name='signup'),
+    path('login/', login_view, name='login'),
+    path('protected/', protected_view, name='protected'),
     path('api/', include('backend.api.urls')),  # 👈 `/api/` のリクエストを `api.urls.py` に転送
 ]
+
+# handler404 = "backend.views.custom_404_view"

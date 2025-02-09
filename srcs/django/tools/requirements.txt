@@ -5,3 +5,7 @@ django-extensions
 gunicorn
 psycopg2
 python-dotenv
+djangorestframework-simplejwt
+django-otp 
+qrcode
+Pillow

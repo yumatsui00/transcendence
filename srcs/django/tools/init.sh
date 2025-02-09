@@ -22,6 +22,8 @@ echo "Migrating..."
 # 🔹 `app` のマイグレーションを適用
 python manage.py makemigrations api
 python manage.py migrate --noinput 
+python manage.py collectstatic --noinput #static内のファイルをstaticfilesにコピー
+
 
 
 echo "🦄starting Django with Gunicorn..."
