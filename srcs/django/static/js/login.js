@@ -1,33 +1,59 @@
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // フォーム送信を防ぐ
 
-
-document.getElementById("signupBtn").addEventListener("click", async function () {
-    const username = document.getElementById("username").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    const language = document.getElementById("language").value;
-    const color = 0
+    const errorMessage = document.getElementById("error-message");
 
-    if (!username || !email || !password) {
-        document.getElementById("message").textContent = "All fields are required";
+    // // 簡単なバリデーション
+    // if (!email.includes("@")) {
+    //     errorMessage.textContent = "正しいメールアドレスを入力してください。";
+    //     errorMessage.style.display = "block";
+    //     return;
+    // }
+
+    if (password.length < 8) {
+        errorMessage.textContent = "パスワードは8文字以上入力してください。";
+        errorMessage.style.display = "block";
         return;
     }
 
+    // バリデーション成功
+    errorMessage.style.display = "none";
+
+
     try {
-        const response = await fetch("/api/signup", {
+        const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password, language, color }),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email, password: password })
         });
 
         const data = await response.json();
-        document.getElementById("message").textContent = data.message;
 
-        if (data.success) {
-            alert("Signup successful!");
-            window.location.href = "/login";  // 成功したらログインページへリダイレクト
+        if (response.ok) {
+            alert("ログイン成功！"); // 成功時の処理（リダイレクトなど）
+            //TODO responseの2fa_requiresがTrueなら2fa
+            if (data.requires_2fa) {
+                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(data.email)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`
+            } else {
+                //TODO jwt Token
+            }
+            console.log("レスポンス:", data);
+        } else {
+            errorMessage.textContent = data.message || "ログインに失敗しました。";
+            errorMessage.style.display = "block";
         }
     } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("message").textContent = "Signup failed";
+        errorMessage.textContent = "サーバーに接続できませんでした。";
+        errorMessage.style.display = "block";
+        console.error("エラー:", error);
     }
+
+    console.log("メール:", email);
+    console.log("パスワード:", password);
+
+    alert("ログイン成功！（仮）");
 });

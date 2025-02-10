@@ -169,23 +169,30 @@ def verify_otp(request):
         return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
+@api_view(["POST"])
 def login_view(request):
-    if request.user.is_authenticated:
-        return redirect("/home/")  # 🔥 すでにログイン済みなら `/home/` にリダイレクト
+	try:
+		data = json.loads(request.body)
+		email = data.get("email")
+		password = data.get("password")
+		if not email or not password:
+			return error_response("Email and Password are required")
 
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
+		try:
+			user = CustomUser.objects.get(email=email)
+		except CustomUser.DoesNotExist:
+			return error_response("Invalid email or password")
 
-        if user is not None:
-            login(request, user)
-            return redirect("/home/")  # 🔥 ログイン成功なら `/home/` へ
+		if not check_password(password, user.password):
+			return error_response("Invalid email or password")	
 
-    return render(request, "login.html")
+		#ここで2faが行われているか見る
+		if user.is_2fa_enabled and not user.is_2fa_verified:
+			return success_response("2FA authentication required", {"requires_2fa": True, "email": email, "qr_code_url": user.qr_code_url})
+
+		return success_response("Login Success", {"requires_2fa": False})
+	except json.JSONDecodeError:
+		return error_response("Invalid JSON")
 
 
 # @api_view(["GET"])
