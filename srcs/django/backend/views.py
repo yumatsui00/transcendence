@@ -15,6 +15,13 @@ import qrcode
 import io
 import base64
 
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
+from rest_framework import status
+
+CustomUser = get_user_model()
+
+
 
 # def custom_404_view(request, exception):
 #     return render(request, "404.html", status=404)
@@ -85,7 +92,7 @@ def signup_view(request):
 	# 2fa用のqrコード生成
 	if is_2fa_enabled:
 		#otp_secretはOTPを作成するための秘密鍵のようなもので、これをもとに新しいTOTPを作成。そのURIを作成
-		otp_uri = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=email, issuer_name="MyApp")
+		otp_uri = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=email, issuer_name="トラセン")
 		#otp_uriをQRコードに変換
 		qr = qrcode.make(otp_uri)
 		#qrをPNG形式でメモリに格納→フロントエンドでかんたんに表示
@@ -106,6 +113,30 @@ def signup_view(request):
 		}
 	)
 
+@api_view(["POST"])
+def verify_otp(request):
+    email = request.data.get("email")
+    otp = request.data.get("otp")
+
+    if not email or not otp:
+        return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if not user.otp_secret:
+        return Response({"message": "2FA is not enabled for this user"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # ✅ ワンタイムパスワードの検証
+    totp = pyotp.TOTP(user.otp_secret)
+    if totp.verify(otp):
+        # ✅ 認証成功したらログイン処理 (セッション or JWT)
+        # ここでは仮に成功レスポンスを返す
+        return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
+    else:
+        return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -149,32 +180,8 @@ def generate_qr(request):
     return HttpResponse(buf.getvalue(), content_type="image/png")
 
 
-@api_view(["POST"])
-def verify_otp(request):
-    email = request.data.get("email")
-    otp_input = request.data.get("otp")
 
-    try:
-        user = CustomUser.objects.get(email=email)
-    except CustomUser.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=400)
 
-    # OTP を検証
-    totp = pyotp.TOTP(user.otp_secret)
-    if not totp.verify(otp_input):
-        return JsonResponse({"error": "Invalid OTP"}, status=400)
-
-    # 認証成功 → 2FA 有効化
-    user.is_2fa_enabled = True
-    user.save()
-
-    # JWT トークンを発行
-    refresh = RefreshToken.for_user(user)
-    return JsonResponse({
-        "message": "2FA verification successful",
-        "access_token": str(refresh.access_token),
-        "refresh_token": str(refresh)
-    }, status=200)
 
 @login_required
 def protected_view(request):

@@ -87,19 +87,22 @@
         </div>
     </div>
 
-    <!-- ✅ OTP 入力モーダル -->
+
+    <!-- OTP モーダル -->
     <div class="modal fade" id="otp-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Enter OTP</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">ワンタイムパスワード入力</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <input type="text" id="otp" class="form-control" placeholder="Enter OTP" required>
+                <div class="modal-body">
+                    <p>認証アプリで生成されたワンタイムパスワードを入力してください。</p>
+                    <input type="text" id="otp" class="form-control" placeholder="6桁のコード">
+                    <p id="otp-message" class="mt-2 text-danger"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="verify-otp" class="btn btn-primary">Verify</button>
+                    <button id="verify-otp-button" class="btn btn-primary">認証</button>
                 </div>
             </div>
         </div>

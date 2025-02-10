@@ -86,12 +86,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     qrCodeImg.src = data.qr_code_url;
                     const qrModal = new bootstrap.Modal(document.getElementById("qr-modal"));
                     qrModal.show();
+                    //!次やること。QRコードの表示を画面遷移をして行う。レスポンスが帰ってきたら別のAPIにqrとともにリクエスト→OK→ワンタイムパス用のページに移動。→戻ることも可能
+
+                    // ✅ QRコードを閉じたら OTP モーダルを表示
+                    qrModalElement.addEventListener("hidden.bs.modal", () => {
+                    const otpModal = new bootstrap.Modal(otpModalElement);
+                    otpModal.show();
+                });
                 } else {
                     alert("SignUp has done successfully! Redirecting to login")
                     // const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
                     //     method: "POST",
                     //     body: 
                     // })
+                    
 
                 }
                 
@@ -102,33 +110,57 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ✅ QRコードモーダルを閉じたら OTP 入力を表示
+    // ✅ QRコードモーダルを閉じたら OTP 入力モーダルを表示
     closeQrButton.addEventListener("click", () => {
-        const qrModal = bootstrap.Modal.getInstance(document.getElementById("qr-modal"));
-        qrModal.hide();
+        console.log("QRモーダル閉じるボタンがクリックされた");
 
-        const otpModal = new bootstrap.Modal(document.getElementById("otp-modal"));
+        // QRモーダルを取得し閉じる
+        const qrModal = bootstrap.Modal.getInstance(qrModalElement);
+        if (qrModal) {
+            qrModal.hide();
+        } else {
+            console.error("QRモーダルが取得できませんでした");
+        }
+
+        // OTPモーダルを開く
+        const otpModal = new bootstrap.Modal(otpModalElement);
         otpModal.show();
+
+        // 入力欄をクリア
+        otpInput.value = "";
+        messageBox.textContent = "";
     });
 
     // ✅ OTP 認証処理
-    verifyOtpButton.addEventListener("click", async () => {
-        const otp = document.getElementById("otp").value;
+    verifyOtpButton.addEventListener("click", async function () {
+        const otpCode = otpInput.value.trim(); // 空白除去
 
-        const response = await fetch("https://yumatsui.42.fr/verify_otp/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: userEmail, otp })
-        });
+        if (!otpCode) {
+            messageBox.textContent = "ワンタイムパスワードを入力してください。";
+            messageBox.style.color = "red";
+            return;
+        }
 
-        const data = await response.json();
-        if (response.ok) {
-            alert("2FA verification successful! You are now logged in.");
-            localStorage.setItem("access_token", data.access_token);
-            localStorage.setItem("refresh_token", data.refresh_token);
-            window.location.href = "/home/";
-        } else {
-            alert(data.error);
+        try {
+            const response = await fetch("/authenticator/verify_otp/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp: otpCode })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("OTP 認証成功！ダッシュボードへ移動します。");
+                window.location.href = "/dashboard"; // 認証成功後のリダイレクト
+            } else {
+                messageBox.textContent = data.message || "OTP 認証に失敗しました。";
+                messageBox.style.color = "red";
+            }
+        } catch (error) {
+            console.error("OTP verification error:", error);
+            messageBox.textContent = "エラーが発生しました。もう一度試してください。";
+            messageBox.style.color = "red";
         }
     });
 });
