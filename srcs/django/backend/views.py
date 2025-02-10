@@ -11,6 +11,10 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes  # ✅ 追加
 from rest_framework.permissions import IsAuthenticated
 import re
+import qrcode
+import io
+import base64
+
 
 # def custom_404_view(request, exception):
 #     return render(request, "404.html", status=404)
@@ -79,11 +83,27 @@ def signup_view(request):
 
 	qr_code_url = None
 	# 2fa用のqrコード生成
-	# if is_2fa_enabled:
+	if is_2fa_enabled:
+		#otp_secretはOTPを作成するための秘密鍵のようなもので、これをもとに新しいTOTPを作成。そのURIを作成
+		otp_uri = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=email, issuer_name="MyApp")
+		#otp_uriをQRコードに変換
+		qr = qrcode.make(otp_uri)
+		#qrをPNG形式でメモリに格納→フロントエンドでかんたんに表示
+		qr_io = io.BytesIO()
+		qr.save(qr_io, format="PNG")
+
+		# QRコードを Base64 でエンコードしてレスポンスに含める
+		qr_code_base64 = base64.b64encode(qr_io.getvalue()).decode("utf-8")
+		qr_code_url = f"data:image/png;base64,{qr_code_base64}"
 
 	return success_response(
 		"SignUp successful. Scan QR to enable 2FA" if is_2fa_enabled else "SignUp Successful",
-		{"is_2fa_enabled": is_2fa_enabled, "password": password, "email":email}
+		{
+			"is_2fa_enabled": is_2fa_enabled,
+			"password": password,
+			"email":email,
+			"qr_code_url": qr_code_url
+		}
 	)
 
 

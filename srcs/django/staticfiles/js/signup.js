@@ -83,8 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 //TODO このresponseにis_2fa_enableだけでなく、ログインデータ（passとemailを含める）
                 if (data.is_2fa_enabled) {
                     alert("SignUp has done successfully! Generating QR code for 2FA")
-                    qrCodeImg.src = `https://yumatsui.42.fr/authenticator/generate_qr/?email=${userEmail}`;
-                    qrSection.style.display = "flex";
+                    qrCodeImg.src = data.qr_code_url;
+                    const qrModal = new bootstrap.Modal(document.getElementById("qr-modal"));
+                    qrModal.show();
                 } else {
                     alert("SignUp has done successfully! Redirecting to login")
                     // const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
@@ -101,10 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ✅ QRコードモーダルを閉じて OTP 入力を表示
+    // ✅ QRコードモーダルを閉じたら OTP 入力を表示
     closeQrButton.addEventListener("click", () => {
-        qrSection.style.display = "none";
-        otpPopup.style.display = "flex";
+        const qrModal = bootstrap.Modal.getInstance(document.getElementById("qr-modal"));
+        qrModal.hide();
+
+        const otpModal = new bootstrap.Modal(document.getElementById("otp-modal"));
+        otpModal.show();
     });
 
     // ✅ OTP 認証処理
