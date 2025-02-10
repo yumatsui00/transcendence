@@ -19,6 +19,11 @@ import re
 def landing_page(request):
     return render(request, "index.html") 
 
+
+@api_view(["GET"])
+def home_page(request):
+    return render(request, "home.html") 
+
 @api_view(["GET"])
 def signup_page(request):
     #TODO トークンを持っている→/homeへ
@@ -71,6 +76,10 @@ def signup_view(request):
 		otp_secret=otp_secret,
 		is_2fa_enabled=is_2fa_enabled,
 	)
+
+	qr_code_url = None
+	# 2fa用のqrコード生成
+	# if is_2fa_enabled:
 
 	return success_response(
 		"SignUp successful. Scan QR to enable 2FA" if is_2fa_enabled else "SignUp Successful",

@@ -1,0 +1,15 @@
+{
+	"connections": [
+	  {
+		"id": "postgresql_connection",
+		"name": "MyPostgres",
+		"driver": "postgresql",
+		"host": "TNet",
+		"port": 5432,
+		"database": "trascen_db",
+		"user": "trascen_user",
+		"password": "trascen_pass",
+		"savePassword": true
+	  }
+	]
+  }

@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 //TODO このresponseにis_2fa_enableだけでなく、ログインデータ（passとemailを含める）
                 if (data.is_2fa_enabled) {
                     alert("SignUp has done successfully! Generating QR code for 2FA")
-                    qrCodeImg.src = `https://yumatsui.42.fr/generate_qr/?email=${userEmail}`;
+                    qrCodeImg.src = `https://yumatsui.42.fr/authenticator/generate_qr/?email=${userEmail}`;
                     qrSection.style.display = "flex";
                 } else {
                     alert("SignUp has done successfully! Redirecting to login")

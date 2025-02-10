@@ -49,6 +49,20 @@ services:
     networks:
       - TNet
 
+  # dbeaver:
+  #   build:
+  #     context: srcs/cloudbeaver
+  #     dockerfile: Dockerfile
+  #   container_name: CLOUDBEAVER
+  #   ports:
+  #     - "8080:8978"
+  #   environment:
+  #     CB_ADMIN_NAME: cbadmin
+  #     CB_ADMIN_PASSWORD: CBadmin123
+  #     CB_PUBLIC_URL: http://localhost:8080
+  #   networks:
+  #     - TNet
+
 networks:
   TNet: 
     driver: bridge
