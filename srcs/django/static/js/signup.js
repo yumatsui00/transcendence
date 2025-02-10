@@ -84,23 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.is_2fa_enabled) {
                     alert("SignUp has done successfully! Generating QR code for 2FA")
                     qrCodeImg.src = data.qr_code_url;
-                    const qrModal = new bootstrap.Modal(document.getElementById("qr-modal"));
-                    qrModal.show();
-                    //!次やること。QRコードの表示を画面遷移をして行う。レスポンスが帰ってきたら別のAPIにqrとともにリクエスト→OK→ワンタイムパス用のページに移動。→戻ることも可能
-
-                    // ✅ QRコードを閉じたら OTP モーダルを表示
-                    qrModalElement.addEventListener("hidden.bs.modal", () => {
-                    const otpModal = new bootstrap.Modal(otpModalElement);
-                    otpModal.show();
-                });
+                    // ✅ `fetch` せずに **リダイレクト**
+                    window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(userEmail)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`;
                 } else {
                     alert("SignUp has done successfully! Redirecting to login")
                     // const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
                     //     method: "POST",
                     //     body: 
                     // })
-                    
-
                 }
                 
             }
@@ -109,28 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
             messageBox.textContent = "Signup failed";
         }
     });
-
-    // ✅ QRコードモーダルを閉じたら OTP 入力モーダルを表示
-    closeQrButton.addEventListener("click", () => {
-        console.log("QRモーダル閉じるボタンがクリックされた");
-
-        // QRモーダルを取得し閉じる
-        const qrModal = bootstrap.Modal.getInstance(qrModalElement);
-        if (qrModal) {
-            qrModal.hide();
-        } else {
-            console.error("QRモーダルが取得できませんでした");
-        }
-
-        // OTPモーダルを開く
-        const otpModal = new bootstrap.Modal(otpModalElement);
-        otpModal.show();
-
-        // 入力欄をクリア
-        otpInput.value = "";
-        messageBox.textContent = "";
-    });
-
     // ✅ OTP 認証処理
     verifyOtpButton.addEventListener("click", async function () {
         const otpCode = otpInput.value.trim(); // 空白除去

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import landing_page, signup_page, login_page, home_page, signup_view, verify_otp
+from .views import landing_page, signup_page, login_page, home_page, signup_view, verify_otp, qr_view, otp_view
 urlpatterns = [
     path("", landing_page, name="landing_page"),
     path('admin/', admin.site.urls),
@@ -24,6 +24,9 @@ urlpatterns = [
     path('home/', home_page, name='home_page'),
     path('authenticator/signup/', signup_view, name='signup'),
     path('authenticator/verify_otp/', verify_otp, name='verify_otp'),
+    path('authenticator/qr/', qr_view, name='qr_view'),
+    path('authenticator/otp/', otp_view, name='verify_otp'),
+    
     # path('protected/', protected_view, name='protected'),
     # path('generate_qr/', generate_qr, name='generate_qr'),
     # path('verify_otp/', verify_otp, name='verify_otp'),

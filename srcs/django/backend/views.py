@@ -14,10 +14,11 @@ import re
 import qrcode
 import io
 import base64
-
+import json
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils import timezone
 
 CustomUser = get_user_model()
 
@@ -44,6 +45,19 @@ def signup_page(request):
 def login_page(request):
     #TODO トークンを持っている→/homeへ
     return render(request, "login.html")
+
+@csrf_exempt
+@api_view(["GET"])
+def qr_view(request):
+	email = request.GET.get("email")
+	qr_code_url = request.GET.get("qr_code_url")
+
+	if not email or not qr_code_url:
+		return JsonResponse({"error": "Invalid request"}, status=400)
+
+	# ✅ `qr.html` をレンダリング
+	return render(request, "qr.html", {"qr_code_url": qr_code_url})
+
 
 @csrf_exempt
 @api_view(["POST"])
@@ -113,6 +127,19 @@ def signup_view(request):
 		}
 	)
 
+@api_view(["GET"])
+def otp_view(request):
+	email = request.GET.get("email")
+	qr_code_url = request.GET.get("qr_code_url")
+
+	if not email or not qr_code_url:
+		return JsonResponse({"error": "Invalid request"}, status=400)
+
+	# ✅ `qr.html` をレンダリング
+	return render(request, "otp.html", {"qr_code_url": qr_code_url})
+
+
+
 @api_view(["POST"])
 def verify_otp(request):
     email = request.data.get("email")
@@ -131,12 +158,16 @@ def verify_otp(request):
 
     # ✅ ワンタイムパスワードの検証
     totp = pyotp.TOTP(user.otp_secret)
-    if totp.verify(otp):
-        # ✅ 認証成功したらログイン処理 (セッション or JWT)
-        # ここでは仮に成功レスポンスを返す
+    if totp.verify(otp, valid_window=1):  # ⬅ 時間ずれを考慮
+        # ✅ 2FA認証済みフラグを True に更新
+        user.is_2fa_verified = True
+        user.last_login = timezone.now()  # ついでに最終ログインも更新
+        user.save(update_fields=["is_2fa_verified", "last_login"])  # 最適化
+
         return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
     else:
         return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -157,27 +188,27 @@ def login_view(request):
     return render(request, "login.html")
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def generate_qr(request):
-    user = request.user
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def generate_qr(request):
+#     user = request.user
     
-    # 2FA シークレットキーがない場合は新規作成
-    if not user.otp_secret:
-        user.otp_secret = pyotp.random_base32()
-        user.save()
+#     # 2FA シークレットキーがない場合は新規作成
+#     if not user.otp_secret:
+#         user.otp_secret = pyotp.random_base32()
+#         user.save()
 
-    # Google Authenticator 用の URI を生成
-    totp = pyotp.TOTP(user.otp_secret)
-    otp_uri = totp.provisioning_uri(name=user.email, issuer_name="MyDjangoApp")
+#     # Google Authenticator 用の URI を生成
+#     totp = pyotp.TOTP(user.otp_secret)
+#     otp_uri = totp.provisioning_uri(name=user.email, issuer_name="MyDjangoApp")
 
-    # QRコードを生成
-    qr = qrcode.make(otp_uri)
-    buf = io.BytesIO()
-    qr.save(buf, format="PNG")
-    buf.seek(0)
+#     # QRコードを生成
+#     qr = qrcode.make(otp_uri)
+#     buf = io.BytesIO()
+#     qr.save(buf, format="PNG")
+#     buf.seek(0)
 
-    return HttpResponse(buf.getvalue(), content_type="image/png")
+#     return HttpResponse(buf.getvalue(), content_type="image/png")
 
 
 
