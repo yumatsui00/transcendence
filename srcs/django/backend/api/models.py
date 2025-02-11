@@ -8,9 +8,11 @@ class CustomUser(AbstractUser):
 	color = models.IntegerField(default=0)
 	profile_image = models.ImageField(upload_to="profile_images/", default="profile_images/default.png")
 
+	qr_code_url = models.CharField(max_length=2000, blank=True, null=True)
 	otp_secret = models.CharField(max_length=32, blank=True, null=True)  # 2FA シークレットキー
 	is_2fa_enabled = models.BooleanField(default=False)  # 2FA が有効かどうか。
 	is_2fa_verified = models.BooleanField(default=False)
+	temp_login = models.BooleanField(default=False)
 
 	# `related_name` を設定して衝突を回避
 	# groups = models.ManyToManyField(Group, related_name="customuser_set", blank=True)

@@ -35,13 +35,18 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
 
         if (response.ok) {
             alert("ログイン成功！"); // 成功時の処理（リダイレクトなど）
+            console.log("シュトクdata: ", data)
             //TODO responseの2fa_requiresがTrueなら2fa
             if (data.requires_2fa) {
                 window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(data.email)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`
             } else {
                 //TODO jwt Token
+                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("refresh_token", data.refresh_token);
+                console.log("JWT トークン取得完了:", data.access_token);
+                // ✅ 認証後のページへリダイレクト
+                window.location.href = "https://yumatsui.42.fr/home/";
             }
-            console.log("レスポンス:", data);
         } else {
             errorMessage.textContent = data.message || "ログインに失敗しました。";
             errorMessage.style.display = "block";
@@ -52,8 +57,6 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         console.error("エラー:", error);
     }
 
-    console.log("メール:", email);
-    console.log("パスワード:", password);
 
     alert("ログイン成功！（仮）");
 });

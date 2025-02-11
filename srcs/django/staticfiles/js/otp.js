@@ -3,9 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = params.get("email");
     const qrCodeUrl = params.get("qr_code_url");
 
-    console.log("Email:", email);
-    console.log("QR Code URL:", qrCodeUrl);
-
     document.getElementById("verify-otp-btn").addEventListener("click", async () => {
         const otpCode = document.getElementById("otp").value.trim();
 
@@ -22,10 +19,33 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
+            console.log(data)
             if (response.ok) {
-                alert("OTP Verified! Redirecting to dashboard.");
-                //TODO login flow
-                window.location.href = "/home"; // 認証成功後のリダイレクト
+                alert("２段階認証を承認しました");
+
+                // ✅ OTP 認証成功後に再度 `login_view` を呼び出す
+                const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email: email })  // ✅ 2回目のログイン
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (loginResponse.ok) {
+                    // ✅ JWT を保存
+                    localStorage.setItem("access_token", loginData.access_token);
+                    localStorage.setItem("refresh_token", loginData.refresh_token);
+
+                    alert(`JWT トークン取得完了: ${loginData.access_token}`);
+                    
+                    // ✅ 認証後のページへリダイレクト
+                    window.location.href = "https://yumatsui.42.fr/home/";
+                } else {
+                    alert("ログイン失敗！")
+                }
             } else {
                 document.getElementById("otp-message").textContent = data.message || "Invalid OTP.";
             }

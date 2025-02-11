@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from .api.utils import *
@@ -19,6 +19,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken 
 
 CustomUser = get_user_model()
 
@@ -91,16 +92,6 @@ def signup_view(request):
 
 	otp_secret = pyotp.random_base32() if is_2fa_enabled else "" #2FA用のシークレットキーを作成
 
-	user = CustomUser.objects.create(
-		username=username,
-		email=email,
-		password=hashed_password,
-		language=language,
-		color=0,
-		profile_image=profile_image if profile_image else "profile_images/default.png",
-		otp_secret=otp_secret,
-		is_2fa_enabled=is_2fa_enabled,
-	)
 
 	qr_code_url = None
 	# 2fa用のqrコード生成
@@ -116,6 +107,18 @@ def signup_view(request):
 		# QRコードを Base64 でエンコードしてレスポンスに含める
 		qr_code_base64 = base64.b64encode(qr_io.getvalue()).decode("utf-8")
 		qr_code_url = f"data:image/png;base64,{qr_code_base64}"
+
+	user = CustomUser.objects.create(
+		username=username,
+		email=email,
+		password=hashed_password,
+		language=language,
+		color=0,
+		profile_image=profile_image if profile_image else "profile_images/default.png",
+		otp_secret=otp_secret,
+		is_2fa_enabled=is_2fa_enabled,
+		qr_code_url=qr_code_url,
+	)
 
 	return success_response(
 		"SignUp successful. Scan QR to enable 2FA" if is_2fa_enabled else "SignUp Successful",
@@ -161,8 +164,9 @@ def verify_otp(request):
     if totp.verify(otp, valid_window=1):  # ⬅ 時間ずれを考慮
         # ✅ 2FA認証済みフラグを True に更新
         user.is_2fa_verified = True
+        user.temp_login = True
         user.last_login = timezone.now()  # ついでに最終ログインも更新
-        user.save(update_fields=["is_2fa_verified", "last_login"])  # 最適化
+        user.save(update_fields=["is_2fa_verified", "temp_login", "last_login"])  # 最適化
 
         return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
     else:
@@ -174,51 +178,38 @@ def login_view(request):
 	try:
 		data = json.loads(request.body)
 		email = data.get("email")
-		password = data.get("password")
-		if not email or not password:
-			return error_response("Email and Password are required")
-
 		try:
 			user = CustomUser.objects.get(email=email)
 		except CustomUser.DoesNotExist:
 			return error_response("Invalid email or password")
 
-		if not check_password(password, user.password):
-			return error_response("Invalid email or password")	
+		if not email:
+			return error_response("Email and Password are required")
 
-		#ここで2faが行われているか見る
-		if user.is_2fa_enabled and not user.is_2fa_verified:
-			return success_response("2FA authentication required", {"requires_2fa": True, "email": email, "qr_code_url": user.qr_code_url})
+		if user.temp_login == False:
+			password = data.get("password")
+			if not password:
+				return error_response("Email and Password are required")
 
-		return success_response("Login Success", {"requires_2fa": False})
+			if not check_password(password, user.password):
+				return error_response("Invalid email or password")	
+
+			#ここで2faが行われているか見る
+			if user.is_2fa_enabled and not user.is_2fa_verified:
+				return success_response("2FA authentication required", {"requires_2fa": True, "email": email, "qr_code_url": user.qr_code_url})
+
+		# ✅ 2回目のログイン（2FA 認証後 or 2FA 無効なユーザー）→ JWT 発行
+		user.temp_login = False
+		user.save(update_fields=["temp_login"])
+		refresh = RefreshToken.for_user(user)
+		return success_response("Login Success", {
+			"requires_2fa": False,
+			"access_token": str(refresh.access_token),
+			"refresh_token": str(refresh)
+		})
+
 	except json.JSONDecodeError:
 		return error_response("Invalid JSON")
-
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def generate_qr(request):
-#     user = request.user
-    
-#     # 2FA シークレットキーがない場合は新規作成
-#     if not user.otp_secret:
-#         user.otp_secret = pyotp.random_base32()
-#         user.save()
-
-#     # Google Authenticator 用の URI を生成
-#     totp = pyotp.TOTP(user.otp_secret)
-#     otp_uri = totp.provisioning_uri(name=user.email, issuer_name="MyDjangoApp")
-
-#     # QRコードを生成
-#     qr = qrcode.make(otp_uri)
-#     buf = io.BytesIO()
-#     qr.save(buf, format="PNG")
-#     buf.seek(0)
-
-#     return HttpResponse(buf.getvalue(), content_type="image/png")
-
-
-
 
 
 @login_required

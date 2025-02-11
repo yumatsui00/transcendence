@@ -87,11 +87,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     // ✅ `fetch` せずに **リダイレクト**
                     window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(userEmail)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`;
                 } else {
-                    alert("SignUp has done successfully! Redirecting to login")
-                    // const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
-                    //     method: "POST",
-                    //     body: 
-                    // })
+                    const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ email: userEmail, password: password })  // ✅ 2回目のログイン
+                    });
+                    const loginData = await loginResponse.json();
+
+                    if (loginResponse.ok) {
+                        // ✅ JWT を保存
+                        localStorage.setItem("access_token", loginData.access_token);
+                        localStorage.setItem("refresh_token", loginData.refresh_token);
+
+                        alert(`JWT トークン取得完了: ${loginData.access_token}`);
+                        
+                        // ✅ 認証後のページへリダイレクト
+                        window.location.href = "https://yumatsui.42.fr/home/";
+                    } else {
+                        alert("ログイン失敗！")
+                    }
                 }
                 
             }
@@ -100,36 +116,5 @@ document.addEventListener("DOMContentLoaded", () => {
             messageBox.textContent = "Signup failed";
         }
     });
-    // ✅ OTP 認証処理
-    verifyOtpButton.addEventListener("click", async function () {
-        const otpCode = otpInput.value.trim(); // 空白除去
 
-        if (!otpCode) {
-            messageBox.textContent = "ワンタイムパスワードを入力してください。";
-            messageBox.style.color = "red";
-            return;
-        }
-
-        try {
-            const response = await fetch("/authenticator/verify_otp/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp: otpCode })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("OTP 認証成功！ダッシュボードへ移動します。");
-                window.location.href = "/dashboard"; // 認証成功後のリダイレクト
-            } else {
-                messageBox.textContent = data.message || "OTP 認証に失敗しました。";
-                messageBox.style.color = "red";
-            }
-        } catch (error) {
-            console.error("OTP verification error:", error);
-            messageBox.textContent = "エラーが発生しました。もう一度試してください。";
-            messageBox.style.color = "red";
-        }
-    });
 });

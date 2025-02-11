@@ -28,7 +28,7 @@ urlpatterns = [
     path('authenticator/qr/', qr_view, name='qr_view'),
     path('authenticator/otp/', otp_view, name='verify_otp'),
     path('authenticator/login/', login_view, name='login_view'),
-    
+
     # path('protected/', protected_view, name='protected'),
     # path('generate_qr/', generate_qr, name='generate_qr'),
     # path('verify_otp/', verify_otp, name='verify_otp'),
