@@ -1,15 +1,39 @@
 {
-	"connections": [
-	  {
-		"id": "postgresql_connection",
-		"name": "MyPostgres",
-		"driver": "postgresql",
-		"host": "TNet",
-		"port": 5432,
-		"database": "trascen_db",
-		"user": "trascen_user",
-		"password": "trascen_pass",
-		"savePassword": true
-	  }
-	]
-  }
+	"folders": {},
+	"connections": {
+		"trascenPostgresDBL": {
+			"provider": "postgresql",
+			"driver": "postgres-jdbc",
+			"name": "Trascen PostgreSQL Database",
+			"configuration": {
+				"host": "postgres",
+				"port": "5432",
+				"database": "trascen_db",
+				"url": "jdbc:postgresql://postgres:5432/trascen_db",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"closeIdleConnection": true,
+				"auth-model": "native",
+				"bootstrap": {
+					"autocommit": true
+				}
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false,
+			"smart-commit": false,
+			"smart-commit-recover": true,
+			"auto-close-transactions": true,
+			"close-transactions-period": 1800,
+			"auto-close-connections": true,
+			"close-connections-period": 14400
+		}
+	}
+}
