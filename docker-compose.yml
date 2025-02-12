@@ -69,6 +69,13 @@ services:
     networks:
       - TNet
 
+  hoppscotch:
+    image: hoppscotch/hoppscotch:latest
+    container_name: hoppscotch
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 networks:
   TNet: 
     driver: bridge
