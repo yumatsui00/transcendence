@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_otp',
     'django_otp.plugins.otp_totp',
+    'channels',
+    'websocket',
 ]
 
 # setting for jwt and 2FA
@@ -175,3 +177,13 @@ SECURE_SSL_REDIRECT = False  # HTTPリクエストをHTTPSにリダイレクト
 CSRF_COOKIE_SECURE = True  # CSRF CookieをHTTPSのみで有効
 SESSION_COOKIE_SECURE = True  # セッションCookieをHTTPSのみで有効
 
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

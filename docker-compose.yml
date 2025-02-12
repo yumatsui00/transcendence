@@ -17,6 +17,25 @@ services:
     networks:
       - TNet
 
+    daphne:
+    image: daphne
+    container_name: DAPHNE
+    command: daphne -b 0.0.0.0 -p 8000 myproject.asgi:application
+    depends_on:
+      - django
+    ports:
+      - "8001:8000"
+    networks:
+      - TNet
+
+  redis:
+    image: redis:alpine
+    container_name: REDIS
+    ports:
+      - "6379:6379"
+    networks:
+      - TNet
+
   postgres:
     build:
       context: srcs/postgres

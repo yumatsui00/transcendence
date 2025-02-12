@@ -45,6 +45,11 @@ def login_page(request):
     #TODO トークンを持っている→/homeへ
     return render(request, "login.html")
 
+@api_view(["GET"])
+def matchmaking_page(request):
+    #TODO トークンを持っている→/homeへ
+    return render(request, "matchmaking.html")
+
 @csrf_exempt
 @api_view(["POST"])
 def signup_view(request):
