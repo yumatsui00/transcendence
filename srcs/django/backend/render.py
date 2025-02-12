@@ -21,3 +21,8 @@ def home_page(request):
 @api_view(["GET"])
 def setting_page(request):
     return render(request, "authorized/setting/setting.html")
+
+@api_view(["GET"])
+def matchmaking_page(request):
+    #TODO トークンを持っている→/homeへ
+    return render(request, "matchmaking.html")

@@ -11,7 +11,7 @@ function handleClick(page) {
             url = '/cpu-battle/'; // CPU対戦ページ
             break;
         case 'Random Match':
-            url = '/random-match/'; // ランダムマッチページ
+            url = '/matchmaking/'; // ランダムマッチページ
             break;
         case 'Friend Battle':
             url = '/friend-battle/'; // 友人対戦ページ

@@ -1,19 +1,16 @@
-up:
-	docker-compose up
+all: up
 
-down:
-	docker-compose down -v
-
-clean:
-	sudo rm -rf srcs/postgres/data
-	mkdir data
+up: 
+	docker compose -f ./docker-compose.yml up
 
 build:
-	docker-compose up --build
+	docker compose -f ./docker-compose.yml build
 
-logs:
-	docker-compose logs -f
+down:
+	docker compose -f ./docker-compose.yml down
 
-full clean:
-	docker system prune
+stop:
+	docker compose -f ./docker-compose.yml stop
 
+clean:
+	docker rmi transcendence-nginx transcendence-django transcendence-postgres transcendence-dbeaver
