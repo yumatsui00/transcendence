@@ -5,3 +5,4 @@ __pycache__/
 *.sqlite3
 /tmp
 srcs/postgres/data
+.DS_Store

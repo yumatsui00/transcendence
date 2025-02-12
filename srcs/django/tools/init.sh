@@ -36,3 +36,6 @@ exec gunicorn \
     --error-logfile - \
     --timeout 120 \
     backend.wsgi:application
+#dpahneに変更
+# echo "🦄starting Django with Daphne..."
+# exec daphne -e ssl:443:privateKey=/etc/ssl/django/django.key:certKey=/etc/ssl/django/django.crt -b 0.0.0.0 -p 8000 backend.asgi:application
