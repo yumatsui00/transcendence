@@ -1,3 +1,7 @@
+import { checkAuth } from "/static/js/utils/checkAuth.js";
+
+checkAuth("https://yumatsui.42.fr/home/", null);
+
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
     event.preventDefault(); // フォーム送信を防ぐ
 

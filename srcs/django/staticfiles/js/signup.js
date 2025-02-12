@@ -1,3 +1,7 @@
+import { checkAuth } from "/static/js/utils/checkAuth.js";
+
+checkAuth("https://yumatsui.42.fr/home/", null);
+
 document.addEventListener("DOMContentLoaded", () => {
     const signupForm = document.getElementById("signup-form");
     const qrSection = document.getElementById("qr-section");

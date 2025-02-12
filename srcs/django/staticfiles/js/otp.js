@@ -1,3 +1,7 @@
+import { checkAuth } from "/static/js/utils/checkAuth.js";
+
+checkAuth("https://yumatsui.42.fr/home/", null);
+
 document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const email = params.get("email");

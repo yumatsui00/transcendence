@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import landing_page, signup_page, login_page, home_page, signup_view, verify_otp, qr_view, otp_view, login_view
+from .views import signup_view, verify_otp, qr_view, otp_view, login_view, check_auth, logout_view
+from rest_framework_simplejwt.views import TokenRefreshView
+from .render import landing_page, signup_page, login_page, home_page, setting_page
 
 urlpatterns = [
     path("", landing_page, name="landing_page"),
@@ -23,11 +25,15 @@ urlpatterns = [
     path('signup/', signup_page, name='signup_page'),
     path('login/', login_page, name='login_page'),
     path('home/', home_page, name='home_page'),
+    path('home/setting/', setting_page, name='setting_page'),
     path('authenticator/signup/', signup_view, name='signup'),
     path('authenticator/verify_otp/', verify_otp, name='verify_otp'),
     path('authenticator/qr/', qr_view, name='qr_view'),
     path('authenticator/otp/', otp_view, name='verify_otp'),
     path('authenticator/login/', login_view, name='login_view'),
+    path("authenticator/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path('authenticator/check_auth/', check_auth, name="check_auth"),
+    path('authenticator/logout/', logout_view, name="logout_view"),
 
     # path('protected/', protected_view, name='protected'),
     # path('generate_qr/', generate_qr, name='generate_qr'),

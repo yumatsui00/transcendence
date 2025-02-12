@@ -1,25 +1,15 @@
-const translations = {
-    en: {
-        welcome: "Welcome to Our Service",
-        signup: "Sign Up",
-        login: "Login"
-    },
-    ja: {
-        welcome: "サービスへようこそ",
-        signup: "サインアップ",
-        login: "ログイン"
-    },
-    fr: {
-        welcome: "Bienvenue sur Notre Service",
-        signup: "S'inscrire",
-        login: "Se connecter"
-    }
-};
+import { checkAuth } from "/static/js/utils/checkAuth.js";
+import { translations_landingpage } from "/static/js/utils/translations.js"
+
+checkAuth("https://yumatsui.42.fr/home/", null);
+
+const translations = translations_landingpage
 
 function updateLanguage(lang) {
     document.getElementById('welcome').textContent = translations[lang].welcome;
     document.getElementById('signup').textContent = translations[lang].signup;
     document.getElementById('login').textContent = translations[lang].login;
+    localStorage.setItem("selected_language", lang);
 }
 
 document.getElementById('language').addEventListener('change', function() {
@@ -27,7 +17,7 @@ document.getElementById('language').addEventListener('change', function() {
 });
 
 document.getElementById('signup').addEventListener('click', function() {
-    window.location.href = '/signup/'
+    window.location.href = 'https://yumatsui.42.fr/signup/'
 });
 
 document.getElementById('login').addEventListener('click', function() {

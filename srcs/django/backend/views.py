@@ -23,29 +23,39 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 CustomUser = get_user_model()
 
+def get_user_from_token(request):
+    """headerのjwtを取得し、デコードしてユーザーを判定する"""
+    auth = JWTAuthentication()
+    header = request.headers.get("Authorization")
+    if not header:
+        return None
+    
+    try:
+        user, _ = auth.authenticate(request)
+        return user
+    except AuthenticationFailed:
+        return None
 
-
-# def custom_404_view(request, exception):
-#     return render(request, "404.html", status=404)
 
 @api_view(["GET"])
-def landing_page(request):
-    return render(request, "index.html") 
+def check_auth(request):
+	"""✅ 認証チェック API(ユーザーのIDとEmailをレスポンスに含める)"""
+	user = get_user_from_token(request)
+
+	if user is None:
+		return error_response("user not found", {"is_authenticated": False, "detail": "Not authenticated"}, status=401)
+
+	return success_response(
+		"authentication verified",
+		{
+		"is_authenticated": True,
+		"user": {
+			"id": user.id,
+			"email": user.email
+		}
+	})
 
 
-@api_view(["GET"])
-def home_page(request):
-    return render(request, "home.html") 
-
-@api_view(["GET"])
-def signup_page(request):
-    #TODO トークンを持っている→/homeへ
-    return render(request, "signup.html")
-
-@api_view(["GET"])
-def login_page(request):
-    #TODO トークンを持っている→/homeへ
-    return render(request, "login.html")
 
 @csrf_exempt
 @api_view(["GET"])
@@ -57,7 +67,7 @@ def qr_view(request):
 		return JsonResponse({"error": "Invalid request"}, status=400)
 
 	# ✅ `qr.html` をレンダリング
-	return render(request, "qr.html", {"qr_code_url": qr_code_url})
+	return render(request, "Unauthorized/qr.html", {"qr_code_url": qr_code_url})
 
 
 @csrf_exempt
@@ -139,7 +149,7 @@ def otp_view(request):
 		return JsonResponse({"error": "Invalid request"}, status=400)
 
 	# ✅ `qr.html` をレンダリング
-	return render(request, "otp.html", {"qr_code_url": qr_code_url})
+	return render(request, "Unauthorized/otp.html", {"qr_code_url": qr_code_url})
 
 
 
@@ -212,6 +222,23 @@ def login_view(request):
 		return error_response("Invalid JSON")
 
 
-@login_required
-def protected_view(request):
-    return render(request, "protected.html")
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])  # JWT 認証が必要
+def logout_view(request):
+    user = request.user
+
+    # 🔹 ユーザーのステータス変更
+    user.is_active = False  # ユーザー無効化
+    user.is_2fa_verified = False  # 2FA 認証をリセット
+    user.save()
+
+    # 🔹 JWT のトークン無効化（Blacklist に追加）
+    try:
+        refresh_token = request.data.get("refresh_token")
+        if refresh_token:
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # トークンを無効化（Blacklist 機能が有効な場合）
+    except Exception as e:
+        return Response({"error": "Invalid refresh token", "detail": str(e)}, status=400)
+
+    return Response({"message": "User logged out and deactivated"}, status=200)
