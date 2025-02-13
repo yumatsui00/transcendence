@@ -92,6 +92,9 @@ def signup_view(request):
 	if len(username) > 10:
 		return error_response("username too long")
 
+	if not re.match(r"^[a-zA-Z0-9]+@[a-zA-Z0-9]+$", email):
+		return error_response("Invalid Email")
+
 	# パスワードのバリデーション（大文字・小文字・数字を含む8文字以上）
 	password_regex = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$")
 	if not password_regex.match(password):
@@ -191,7 +194,7 @@ def login_view(request):
 		try:
 			user = CustomUser.objects.get(email=email)
 		except CustomUser.DoesNotExist:
-			return error_response("Invalid email or password")
+			return error_response("Invalid email or password1")
 
 		if not email:
 			return error_response("Email and Password are required")
@@ -202,7 +205,7 @@ def login_view(request):
 				return error_response("Email and Password are required")
 
 			if not check_password(password, user.password):
-				return error_response("Invalid email or password")	
+				return error_response("Invalid email or password2")	
 
 			#ここで2faが行われているか見る
 			if user.is_2fa_enabled and not user.is_2fa_verified:

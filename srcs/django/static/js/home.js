@@ -2,7 +2,6 @@ import { checkAuth } from "/static/js/utils/checkAuth.js";
 
 checkAuth(null, "https://yumatsui.42.fr/");
 
-
 function handleClick(page) {
     let url = '';
 

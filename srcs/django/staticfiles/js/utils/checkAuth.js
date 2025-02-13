@@ -13,11 +13,12 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
 
     if (!access_token) {
         console.warn("🚨 No access token found.");
-        document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
-        document.body.classList.remove("loading");
         if (noAuthRedirect) {
             window.location.href = noAuthRedirect;
+            return ;
         }
+        document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
+        document.body.classList.remove("loading");
         return;
     }
     
@@ -30,14 +31,16 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
             if (data.is_authenticated) {
                 console.log("✅ ユーザーはログイン済み");
                 if (authRedirect) {
-                    document.body.classList.remove("loading");
+                //     document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
+                //     document.body.classList.remove("loading");
                     window.location.href = authRedirect;
                     return ;
                 }
             } else {
                 console.log("🚨 ユーザーは未認証");
                 if (noAuthRedirect) {
-                    document.body.classList.remove("loading");
+                    // document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
+                    // document.body.classList.remove("loading");
                     window.location.href = noAuthRedirect;
                     return ;
                 }
@@ -49,16 +52,16 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             if (noAuthRedirect) {
-                document.body.classList.remove("loading");
+                // document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
+                //     document.body.classList.remove("loading");
                 window.location.href = noAuthRedirect;
                 return ;
             }
         }
     } catch (error) {
         console.error("🚨 認証リクエスト中にエラー:", error);
-        document.body.classList.remove("loading");
     }
-    console.log("stay here maybe?")
+    // console.log("stay here maybe?")
     document.getElementById("loading-screen").style.display = "none";
     document.body.classList.remove("loading");
 }
