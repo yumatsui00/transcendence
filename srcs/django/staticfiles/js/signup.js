@@ -1,6 +1,6 @@
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 
-checkAuth("https://yumatsui.42.fr/home/", null);
+checkAuth("../home/", null);
 
 document.addEventListener("DOMContentLoaded", () => {
     const signupForm = document.getElementById("signup-form");
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             // ✅ `Content-Type` は `multipart/form-data`
-            const response = await fetch("https://yumatsui.42.fr/authenticator/signup/", {
+            const response = await fetch("../authenticator/signup/", {
                 method: "POST",
                 body: formData
             });
@@ -89,9 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("SignUp has done successfully! Generating QR code for 2FA")
                     qrCodeImg.src = data.qr_code_url;
                     // ✅ `fetch` せずに **リダイレクト**
-                    window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(userEmail)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`;
+                    window.location.href = `../authenticator/qr/?email=${encodeURIComponent(userEmail)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`;
                 } else {
-                    const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+                    const loginResponse = await fetch("../authenticator/login/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         alert(`JWT トークン取得完了: ${loginData.access_token}`);
                         
                         // ✅ 認証後のページへリダイレクト
-                        window.location.href = "https://yumatsui.42.fr/home/";
+                        window.location.href = "../home/";
                     } else {
                         alert("ログイン失敗！")
                     }

@@ -9,16 +9,19 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "8000:442"
     volumes:
       - ./srcs/django:/app
     depends_on:
       - postgres
+      - redis
     networks:
       - TNet
 
   redis:
-    image: redis:latest
+    build:
+      context: srcs/redis
+      dockerfile: Dockerfile
     container_name: REDIS
     ports:
       - "6379:6379"

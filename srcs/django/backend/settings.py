@@ -179,11 +179,13 @@ SESSION_COOKIE_SECURE = True  # セッションCookieをHTTPSのみで有効
 
 ASGI_APPLICATION = 'backend.asgi.application'
 
+redis_host = os.environ.get('REDIS_HOST', 'localhost')    
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [("redis://redis:6379")],
         },
     },
 }

@@ -5,12 +5,12 @@ export async function handleLogout() {
         console.warn("🚨 No access token found. Redirecting to login page...");
 		localStorage.removeItem("access_token");
 		localStorage.removeItem("refresh_token");
-        window.location.href = "https://yumatsui.42.fr/";
+        window.location.href = "../../";
         return;
     }
 
     try {
-        const response = await fetch("https://yumatsui.42.fr/authenticator/logout/", {
+        const response = await fetch("../authenticator/logout/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function handleLogout() {
     localStorage.removeItem("refresh_token");
 
     // 🔹 ログアウト後にログインページへリダイレクト
-    window.location.href = "https://yumatsui.42.fr/";
+    window.location.href = "../../";
 }
 
 
@@ -56,7 +56,7 @@ export async function apiFetch(url, options = {}) {
 	if (response.status === 401 && refresh_token) {
 		console.warn("🔄 access token has expired. Trying refresh token...");
 
-		const refreshResponse = await fetch("https://yumatsui.42.fr/authenticator/refresh/", {
+		const refreshResponse = await fetch("../authenticator/refresh/", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ refresh: refresh_token })

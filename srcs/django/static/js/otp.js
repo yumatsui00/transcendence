@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch("https://yumatsui.42.fr/authenticator/verify_otp/", {
+            const response = await fetch("../authenticator/verify_otp/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email, otp: otpCode }) // ✅ `email` も送信
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("２段階認証を承認しました");
 
                 // ✅ OTP 認証成功後に再度 `login_view` を呼び出す
-                const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+                const loginResponse = await fetch("../authenticator/login/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert(`JWT トークン取得完了: ${loginData.access_token}`);
                     
                     // ✅ 認証後のページへリダイレクト
-                    window.location.href = "https://yumatsui.42.fr/home/";
+                    window.location.href = "../..//home/";
                 } else {
                     alert("ログイン失敗！")
                 }
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ 「Back to QR Code」ボタンを押したときに email & qr_code_url を URL に含める
     document.getElementById("back-to-qr-btn").addEventListener("click", () => {
-        window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(email)}&qr_code_url=${encodeURIComponent(qrCodeUrl)}`;
+        window.location.href = `../authenticator/qr/?email=${encodeURIComponent(email)}&qr_code_url=${encodeURIComponent(qrCodeUrl)}`;
     });
 });
 

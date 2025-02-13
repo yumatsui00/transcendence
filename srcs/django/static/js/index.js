@@ -1,7 +1,7 @@
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 import { translations_landingpage } from "/static/js/utils/translations.js"
 
-checkAuth("https://yumatsui.42.fr/home/", null);
+checkAuth("/home/", null);
 
 const translations = translations_landingpage
 
@@ -17,7 +17,7 @@ document.getElementById('language').addEventListener('change', function() {
 });
 
 document.getElementById('signup').addEventListener('click', function() {
-    window.location.href = 'https://yumatsui.42.fr/signup/'
+    window.location.href = '/signup/'
 });
 
 document.getElementById('login').addEventListener('click', function() {

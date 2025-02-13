@@ -1,6 +1,6 @@
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 
-checkAuth("https://yumatsui.42.fr/home/", null);
+checkAuth("../home/", null);
 
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
     event.preventDefault(); // フォーム送信を防ぐ
@@ -27,7 +27,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
 
 
     try {
-        const response = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+        const response = await fetch("../authenticator/login/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -42,14 +42,14 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
             console.log("シュトクdata: ", data)
             //TODO responseの2fa_requiresがTrueなら2fa
             if (data.requires_2fa) {
-                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(data.email)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`
+                window.location.href = `../authenticator/qr/?email=${encodeURIComponent(data.email)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`
             } else {
                 //TODO jwt Token
                 localStorage.setItem("access_token", data.access_token);
                 localStorage.setItem("refresh_token", data.refresh_token);
                 console.log("JWT トークン取得完了:", data.access_token);
                 // ✅ 認証後のページへリダイレクト
-                window.location.href = "https://yumatsui.42.fr/home/";
+                window.location.href = "../home/";
             }
         } else {
             errorMessage.textContent = data.message || "ログインに失敗しました。";
