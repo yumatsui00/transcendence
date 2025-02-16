@@ -7,8 +7,8 @@ import { apiFetch } from "./apiFetch.js";
  */
 export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
     const access_token = localStorage.getItem("access_token");
-	console.log("arrived checkAuth");
-    console.log(`accesstoken: ${access_token}`);
+    console.log("🔍 Checking Auth...");
+    console.log("🔍 Access Token:", access_token);
     document.body.classList.add("loading");
 
     if (!access_token) {
@@ -36,6 +36,7 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
                 }
             } else {
                 console.log("🚨 ユーザーは未認証");
+                alert("1")
                 if (noAuthRedirect) {
                     window.location.href = noAuthRedirect;
                     return ;
@@ -47,6 +48,7 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
 
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
+            alert("2")
             if (noAuthRedirect) {
                 window.location.href = noAuthRedirect;
                 return ;

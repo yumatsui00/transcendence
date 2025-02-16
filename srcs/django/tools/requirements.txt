@@ -13,3 +13,4 @@ Pillow
 channels
 channels_redis
 daphne
+django-ipware

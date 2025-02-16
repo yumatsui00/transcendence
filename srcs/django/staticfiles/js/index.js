@@ -2,11 +2,6 @@ import { checkAuth } from "/static/js/utils/checkAuth.js";
 import { translations_landingpage } from "/static/js/utils/translations.js"
 
 checkAuth("https://yumatsui.42.fr/home/", null);
-// document.addEventListener("DOMContentLoaded", () => {
-//     document.getElementById("loading-screen").style.display = "none";
-//     document.body.classList.remove("loading");
-// });
-
 const translations = translations_landingpage
 
 function updateLanguage(lang) {

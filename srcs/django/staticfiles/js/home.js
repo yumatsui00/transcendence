@@ -1,10 +1,8 @@
+import { getUserInfo } from "./utils/getUserInfo.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 
 checkAuth(null, "https://yumatsui.42.fr/");
-// document.addEventListener("DOMContentLoaded", () => {
-//     document.getElementById("loading-screen").style.display = "none";
-//     document.body.classList.remove("loading");
-// });
+
 
 function handleClick(page) {
     let url = '';

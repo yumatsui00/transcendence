@@ -1,5 +1,8 @@
+import { loginflow } from "./utils/loginflow.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
-import { translations_format } from "/static/js/utils/translations.js" 
+import { translations_format } from "/static/js/utils/translations.js";
+import { getDeviceName } from "/static/js/utils/getDeviceName.js";
+
 
 checkAuth("https://yumatsui.42.fr/home/", null);
 
@@ -45,6 +48,7 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     const language = lang
     const profileImage = document.getElementById("profile_image").files[0];
     const is_2fa_enabled = document.getElementById("enable-2fa").checked;
+    const deviceName = getDeviceName();
 
     // ✅ `FormData` を使用してデータを送信
     const formData = new FormData();
@@ -71,37 +75,14 @@ document.getElementById("signupForm").addEventListener("submit", async function(
         console.log("Response Data:", data); 
 
         if (response.ok) {
-            console.log("2FA enabled:", data.is_2fa_enabled);
-            
-
-            if (data.is_2fa_enabled) {
-                alert("SignUp has done successfully! Generating QR code for 2FA");
-                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(userEmail)}&qr_code_url=${encodeURIComponent(data.qr_code_url)}`;
-            } else {
-                const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ email: userEmail, password: password })
-                });
-
-                const loginData = await loginResponse.json();
-
-                if (loginResponse.ok) {
-                    localStorage.setItem("access_token", loginData.access_token);
-                    localStorage.setItem("refresh_token", loginData.refresh_token);
-                    alert(`JWT トークン取得完了: ${loginData.access_token}`);
-                    window.location.href = "https://yumatsui.42.fr/home/";
-                } else {
-                    alert("ログイン失敗！");
-                }
-            }
+            loginflow(userEmail, password, deviceName);
         } else {
             console.log(data)
+            alert("signup失敗")
         }
     } catch (error) {
         console.error("Error:", error);
         messageBox.textContent = "Signup failed";
     }
 });
+
