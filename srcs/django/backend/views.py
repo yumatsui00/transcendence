@@ -5,11 +5,11 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from .api.utils import *
-from .api.models import CustomUser
+from .api.models import CustomUser, RefreshTokenStore
 import pyotp
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes  # ✅ 追加
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 import re
 import qrcode
 import io
@@ -19,7 +19,12 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from rest_framework_simplejwt.tokens import RefreshToken 
+from rest_framework_simplejwt.tokens import RefreshToken
+from ipware import get_client_ip
+from datetime import timedelta
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+
 
 CustomUser = get_user_model()
 
@@ -38,40 +43,14 @@ def get_user_from_token(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def check_auth(request):
-	"""✅ 認証チェック API(ユーザーのIDとEmailをレスポンスに含める)"""
-	user = get_user_from_token(request)
-
-	if user is None:
-		return error_response("user not found", {"is_authenticated": False, "detail": "Not authenticated"}, status=401)
-
-	return success_response(
-		"authentication verified",
-		{
-		"is_authenticated": True,
-		"user": {
-			"id": user.id,
-			"email": user.email
-		}
-	})
-
-
-
-@csrf_exempt
-@api_view(["GET"])
-def qr_view(request):
-	email = request.GET.get("email")
-	qr_code_url = request.GET.get("qr_code_url")
-
-	if not email or not qr_code_url:
-		return JsonResponse({"error": "Invalid request"}, status=400)
-
-	# ✅ `qr.html` をレンダリング
-	return render(request, "Unauthorized/qr.html", {"qr_code_url": qr_code_url})
+	return Response({"is_authenticated": True}, status=200)
 
 
 @csrf_exempt
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def signup_view(request):
 	username = request.data.get("username")
 	email = request.data.get("email")
@@ -84,6 +63,7 @@ def signup_view(request):
 
 	if not username or not email or not password or language is None:
 		return error_response("All fields are required")
+
 	#username email の重複チェック
 	if CustomUser.objects.filter(username=username).exists():
 		return error_response("Username already exists")
@@ -91,6 +71,9 @@ def signup_view(request):
 		return error_response("Email already exists")
 	if len(username) > 10:
 		return error_response("username too long")
+
+	if not re.match(r"^[a-zA-Z0-9]+@[a-zA-Z0-9]+$", email):
+		return error_response("Invalid Email")
 
 	# パスワードのバリデーション（大文字・小文字・数字を含む8文字以上）
 	password_regex = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$")
@@ -128,6 +111,7 @@ def signup_view(request):
 		otp_secret=otp_secret,
 		is_2fa_enabled=is_2fa_enabled,
 		qr_code_url=qr_code_url,
+		is_registered_once=False,
 	)
 
 	return success_response(
@@ -140,25 +124,67 @@ def signup_view(request):
 		}
 	)
 
+
+
+@csrf_exempt
+@permission_classes([AllowAny])
+def qr_view(request):
+    email = request.GET.get("email")
+
+    if not email:
+        return JsonResponse({"error": "Email is required"}, status=400)
+
+    try:
+        # ✅ email からユーザーを取得
+        user = CustomUser.objects.get(email=email)
+        
+        # ✅ `qr_code_url` を取得
+        if not user.qr_code_url:
+            return JsonResponse({"error": "QR code not found"}, status=404)
+        if user.is_registered_once:
+            return render(request, "Unauthorized/otp.html", {"is_registered_once": True})
+        # ✅ `qr.html` をレンダリング
+        return render(request, "Unauthorized/qr.html", {"qr_code_url": user.qr_code_url})
+
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def otp_view(request):
-	email = request.GET.get("email")
-	qr_code_url = request.GET.get("qr_code_url")
+    email = request.GET.get("email")
 
-	if not email or not qr_code_url:
-		return JsonResponse({"error": "Invalid request"}, status=400)
+    if not email:
+        return JsonResponse({"error": "Email is required"}, status=400)
 
-	# ✅ `qr.html` をレンダリング
-	return render(request, "Unauthorized/otp.html", {"qr_code_url": qr_code_url})
+    try:
+        # ✅ email からユーザーを取得
+        user = CustomUser.objects.get(email=email)
+        # ✅ `qr_code_url` を取得
+        if not user.qr_code_url:
+            return JsonResponse({"error": "QR code not found"}, status=404)
+        if user.is_registered_once:
+            return render(request, "Unauthorized/otp.html", {"is_registered_once": True})
+        return render(request, "Unauthorized/otp.html", {"qr_code_url": user.qr_code_url, "is_registered_once": False})
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
 
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def verify_otp(request):
     email = request.data.get("email")
     otp = request.data.get("otp")
+    device_name = request.data.get("device")  # クライアントからデバイス名を送信
+    ip_address = get_client_ip(request)
+    # ✅ タプルだった場合は最初の要素だけ取得
+    if isinstance(ip_address, tuple):
+        ip_address = ip_address[0]
 
-    if not email or not otp:
+    if not email or not otp or not device_name:
         return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
@@ -172,50 +198,88 @@ def verify_otp(request):
     # ✅ ワンタイムパスワードの検証
     totp = pyotp.TOTP(user.otp_secret)
     if totp.verify(otp, valid_window=1):  # ⬅ 時間ずれを考慮
-        # ✅ 2FA認証済みフラグを True に更新
-        user.is_2fa_verified = True
-        user.temp_login = True
         user.last_login = timezone.now()  # ついでに最終ログインも更新
-        user.save(update_fields=["is_2fa_verified", "temp_login", "last_login"])  # 最適化
+        user.is_registered_once = True
+        user.save(update_fields=["last_login", "is_registered_once"])  # 最適化
 
-        return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
+        # refreshtokenの発行
+        # ✅ 新しい `refresh_token` を発行
+        refresh = RefreshToken.for_user(user)
+
+        # ✅ `refresh_token` をデータベースに保存
+        RefreshTokenStore.objects.create(
+            user=user,
+            refresh_token=str(refresh),
+            expires_at=timezone.now() + timedelta(days=7),  # `SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']` に合わせる
+            device_name=device_name,  # クライアントのデバイス情報
+            ip_address=ip_address,  # クライアントのIP
+        )
+
+        return success_response("OTP verified successfully", {
+			"access_token": str(refresh.access_token),
+			"refresh_token": str(refresh)
+		})
     else:
         return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login_view(request):
 	try:
 		data = json.loads(request.body)
 		email = data.get("email")
+		password = data.get("password")
 		try:
 			user = CustomUser.objects.get(email=email)
 		except CustomUser.DoesNotExist:
-			return error_response("Invalid email or password")
+			return error_response("Invalid email or password1")
+		is_2fa_enabled = user.is_2fa_enabled
 
 		if not email:
 			return error_response("Email and Password are required")
+		if not password:
+			return error_response("Email and Password are required")
+		if not check_password(password, user.password):
+			return error_response("Invalid email or password2")	
 
-		if user.temp_login == False:
-			password = data.get("password")
-			if not password:
-				return error_response("Email and Password are required")
+		#2fa認証が不要なユーザー
+		if not is_2fa_enabled:
+			refresh = RefreshToken.for_user(user)
+			return success_response("Login Success", {
+				"requires_2fa": False,
+				"access_token": str(refresh.access_token),
+				"refresh_token": str(refresh)
+			})
 
-			if not check_password(password, user.password):
-				return error_response("Invalid email or password")	
 
-			#ここで2faが行われているか見る
-			if user.is_2fa_enabled and not user.is_2fa_verified:
-				return success_response("2FA authentication required", {"requires_2fa": True, "email": email, "qr_code_url": user.qr_code_url})
+		# クライアントのIP, DEVICEを取得
+		ip_address = get_client_ip(request)
+		# ip_address がタプルだった場合、最初の要素（IPアドレスのみ）を取得
+		if isinstance(ip_address, tuple):
+			ip_address = ip_address[0]
+		device_name = request.data.get("device")
+		# ✅ 既存の `refresh_token` を取得
+		valid_token = RefreshTokenStore.objects.filter(
+            user=user, 
+            expires_at__gt=timezone.now(), 
+            ip_address=ip_address, 
+            device_name=device_name
+        ).first()
 
-		# ✅ 2回目のログイン（2FA 認証後 or 2FA 無効なユーザー）→ JWT 発行
-		user.temp_login = False
-		user.save(update_fields=["temp_login"])
-		refresh = RefreshToken.for_user(user)
-		return success_response("Login Success", {
-			"requires_2fa": False,
-			"access_token": str(refresh.access_token),
-			"refresh_token": str(refresh)
+		if valid_token:
+			print("信用されたデバイスとIPアドレス。2FA認証をスキップします")
+			refresh = valid_token.refresh_token
+			return success_response("Login Success", {
+				"requires_2fa": False,
+				"access_token": str(refresh.access_token),
+				"refresh_token": refresh
+			})
+		print("⚠2FA認証が必要です。")
+		return success_response("Need to verify 2FA", {
+			"requires_2fa": True,
+			"email": email,
+			"is_registered_once": user.is_registered_once
 		})
 
 	except json.JSONDecodeError:
@@ -226,18 +290,13 @@ def login_view(request):
 @permission_classes([IsAuthenticated])  # JWT 認証が必要
 def logout_view(request):
     user = request.user
-
-    # 🔹 ユーザーのステータス変更
-    user.is_active = False  # ユーザー無効化
-    user.is_2fa_verified = False  # 2FA 認証をリセット
-    user.save()
-
     # 🔹 JWT のトークン無効化（Blacklist に追加）
     try:
         refresh_token = request.data.get("refresh_token")
+        if not user.is_2fa_enabled:
+            BlacklistedToken.objects.get_or_create(token=token)
         if refresh_token:
             token = RefreshToken(refresh_token)
-            token.blacklist()  # トークンを無効化（Blacklist 機能が有効な場合）
     except Exception as e:
         return Response({"error": "Invalid refresh token", "detail": str(e)}, status=400)
 

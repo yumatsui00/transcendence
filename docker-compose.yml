@@ -57,17 +57,28 @@ services:
     networks:
       - TNet
 
-  dbeaver:
-    build:
-      context: srcs/cloudbeaver
-      dockerfile: Dockerfile
-    container_name: CLOUDBEAVER
-    ports:
-      - "8080:8978"
-    depends_on:
-      - postgres
-    networks:
-      - TNet
+  # dbeaver:
+  #   build:
+  #     context: srcs/cloudbeaver
+  #     dockerfile: Dockerfile
+  #   container_name: CLOUDBEAVER
+  #   ports:
+  #     - "8080:8978"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - TNet
+  #   logging:
+  #     driver: "none"
+
+  # hoppscotch:
+  #   image: hoppscotch/hoppscotch:latest
+  #   container_name: HOPPSCOTCH
+  #   ports:
+  #     - "3000:3000"
+  #   restart: unless-stopped
+  #   logging:
+  #     driver: "none"
 
 networks:
   TNet: 

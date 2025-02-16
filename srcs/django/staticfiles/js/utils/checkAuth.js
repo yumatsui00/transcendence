@@ -7,17 +7,18 @@ import { apiFetch } from "./apiFetch.js";
  */
 export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
     const access_token = localStorage.getItem("access_token");
-	console.log("arrived checkAuth");
-    console.log(`accesstoken: ${access_token}`);
+    console.log("🔍 Checking Auth...");
+    console.log("🔍 Access Token:", access_token);
     document.body.classList.add("loading");
 
     if (!access_token) {
         console.warn("🚨 No access token found.");
-        document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
-        document.body.classList.remove("loading");
         if (noAuthRedirect) {
             window.location.href = noAuthRedirect;
+            return ;
         }
+        document.getElementById("loading-screen").style.display = "none";  // 🔹 ここで非表示にする
+        document.body.classList.remove("loading");
         return;
     }
     
@@ -30,14 +31,13 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
             if (data.is_authenticated) {
                 console.log("✅ ユーザーはログイン済み");
                 if (authRedirect) {
-                    document.body.classList.remove("loading");
                     window.location.href = authRedirect;
                     return ;
                 }
             } else {
                 console.log("🚨 ユーザーは未認証");
+                alert("1")
                 if (noAuthRedirect) {
-                    document.body.classList.remove("loading");
                     window.location.href = noAuthRedirect;
                     return ;
                 }
@@ -48,17 +48,15 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
 
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
+            alert("2")
             if (noAuthRedirect) {
-                document.body.classList.remove("loading");
                 window.location.href = noAuthRedirect;
                 return ;
             }
         }
     } catch (error) {
         console.error("🚨 認証リクエスト中にエラー:", error);
-        document.body.classList.remove("loading");
     }
-    console.log("stay here maybe?")
     document.getElementById("loading-screen").style.display = "none";
     document.body.classList.remove("loading");
 }

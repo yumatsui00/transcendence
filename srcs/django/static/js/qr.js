@@ -5,6 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	document.getElementById("qr-ok-btn").addEventListener("click", () => {
 		// ✅ email と qr_code_url を URL パラメータとして渡す
-		window.location.href = `https://yumatsui.42.fr/authenticator/otp/?email=${encodeURIComponent(email)}&qr_code_url=${encodeURIComponent(qrCodeUrl)}`;
+		window.location.href = `https://yumatsui.42.fr/authenticator/otp/?email=${encodeURIComponent(email)}}`;
 	});
 });
