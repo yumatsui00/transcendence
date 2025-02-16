@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("２段階認証を承認しました");
                 localStorage.setItem("access_token", data.access_token);
                 localStorage.getItem("refresh_token", data.refresh_token);
-                alert(`JWT トークン取得完了: ${loginData.access_token}`);
                 window.location.href = "https://yumatsui.42.fr/home/";
             } else {
                 document.getElementById("otp-message").textContent = data.message || "Invalid OTP.";

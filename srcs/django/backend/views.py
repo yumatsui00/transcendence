@@ -179,9 +179,12 @@ def verify_otp(request):
     email = request.data.get("email")
     otp = request.data.get("otp")
     device_name = request.data.get("device")  # クライアントからデバイス名を送信
-    ip_address = get_client_ip(request)  # クライアントの IP を取得
+    ip_address = get_client_ip(request)
+    # ✅ タプルだった場合は最初の要素だけ取得
+    if isinstance(ip_address, tuple):
+        ip_address = ip_address[0]
 
-    if not email or not otp or device_name:
+    if not email or not otp or not device_name:
         return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
@@ -252,6 +255,9 @@ def login_view(request):
 
 		# クライアントのIP, DEVICEを取得
 		ip_address = get_client_ip(request)
+		# ip_address がタプルだった場合、最初の要素（IPアドレスのみ）を取得
+		if isinstance(ip_address, tuple):
+			ip_address = ip_address[0]
 		device_name = request.data.get("device")
 		# ✅ 既存の `refresh_token` を取得
 		valid_token = RefreshTokenStore.objects.filter(

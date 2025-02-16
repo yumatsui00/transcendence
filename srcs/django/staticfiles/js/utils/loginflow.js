@@ -12,10 +12,12 @@ export async function loginflow(email, password, deviceName) {
             // 2FA認証が必要
             if (loginData.is_registered_once) {
                 // 2FA認証を行ったことがある→OTP入力へ
-                window.location.href = `https://yumatsui.42.fr/authenticator/otp/?email=${encodeURIComponent(email)}}`;
+                alert("OTP入力へ")
+                window.location.href = `https://yumatsui.42.fr/authenticator/otp/?email=${encodeURIComponent(email)}`;
             } else {
+                alert("2FA認証へ")
                 // 2FA認証を行ったことがない→qr登録へ
-                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(email)}}`;
+                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(email)}`;
             }
         } else {
             //2FA認証が不必要→homeへ
