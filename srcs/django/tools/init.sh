@@ -26,16 +26,16 @@ python manage.py collectstatic --noinput #static内のファイルをstaticfiles
 
 
 
-echo "🦄starting Django with Gunicorn..."
-exec gunicorn \
-    --certfile=/etc/ssl/django/django.crt \
-    --keyfile=/etc/ssl/django/django.key \
-    --bind 0.0.0.0:8000 \
-    --workers 4 \
-    --access-logfile - \
-    --error-logfile - \
-    --timeout 120 \
-    backend.wsgi:application
+# echo "🦄starting Django with Gunicorn..."
+# exec gunicorn \
+#     --certfile=/etc/ssl/django/django.crt \
+#     --keyfile=/etc/ssl/django/django.key \
+#     --bind 0.0.0.0:8000 \
+#     --workers 4 \
+#     --access-logfile - \
+#     --error-logfile - \
+#     --timeout 120 \
+#     backend.wsgi:application
 #dpahneに変更
-# echo "🦄starting Django with Daphne..."
-# exec daphne -e ssl:443:privateKey=/etc/ssl/django/django.key:certKey=/etc/ssl/django/django.crt -b 0.0.0.0 -p 8000 backend.asgi:application
+echo "🦄starting Django with Daphne..."
+exec daphne -e ssl:442:privateKey=/etc/ssl/django/django.key:certKey=/etc/ssl/django/django.crt -b 0.0.0.0 backend.asgi:application

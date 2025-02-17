@@ -1,7 +1,7 @@
 import { getUserInfo } from "./utils/getUserInfo.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 
-checkAuth(null, "https://yumatsui.42.fr/");
+checkAuth(null, "../");
 
 
 function handleClick(page) {

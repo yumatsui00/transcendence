@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch("https://yumatsui.42.fr/authenticator/verify_otp/", {
+            const response = await fetch("../authenticator/verify_otp/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email, otp: otpCode, device: deviceName }) // ✅ `email` も送信

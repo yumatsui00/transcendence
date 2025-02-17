@@ -7,15 +7,19 @@ export async function handleLogout() {
         console.warn("🚨 No access token found. Redirecting to login page...");
 		localStorage.removeItem("access_token");
 		localStorage.removeItem("refresh_token");
+<<<<<<< HEAD
+        window.location.href = "../../";
+=======
 		localStorage.removeItem("user_info");
 		globalUserInfo = null;
 
         window.location.href = "https://yumatsui.42.fr/";
+>>>>>>> main
         return;
     }
 
     try {
-        const response = await fetch("https://yumatsui.42.fr/authenticator/logout/", {
+        const response = await fetch("../authenticator/logout/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -37,7 +41,7 @@ export async function handleLogout() {
     localStorage.removeItem("refresh_token");
 
     // 🔹 ログアウト後にログインページへリダイレクト
-    window.location.href = "https://yumatsui.42.fr/";
+    window.location.href = "../../";
 }
 
 
@@ -95,9 +99,45 @@ export async function apiFetch(url, options = {}) {
             console.error(`🚨 API Error: ${response.status} ${response.statusText}`);
         }
 
+<<<<<<< HEAD
+		const refreshResponse = await fetch("../authenticator/refresh/", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ refresh: refresh_token })
+		});
+
+		if (refreshResponse.ok) {
+			const refreshData = await refreshResponse.json();
+
+			// ✅ 新しいアクセストークンが取得できた場合のみ保存
+			if (refreshData.access) {
+				console.log("✅ Got a new access token, retrying request...");
+
+				localStorage.setItem("access_token", refreshData.access);
+				options.headers["Authorization"] = `Bearer ${refreshData.access}`;
+
+				// ✅ もう一度 API リクエストを実行
+				response = await fetch(url, options);
+			} else {
+				console.error("🚨 Failed to get new access token, logging out...");
+				handleLogout();
+				return response;
+			}
+		} else {
+			console.error("🚨 Refresh token expired or invalid. Logging out...");
+			handleLogout();
+			return response;
+		}
+	} else {
+		console.log("成功したってこと")
+	}
+	// ✅ 401 以外のレスポンスはそのまま返す
+	return response;
+=======
         return response;
     } catch (error) {
         console.error("🚨 API request failed:", error);
         return new Response(JSON.stringify({ error: "Network error" }), { status: 500 });
     }
+>>>>>>> main
 }

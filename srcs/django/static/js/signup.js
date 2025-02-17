@@ -4,7 +4,7 @@ import { translations_format } from "/static/js/utils/translations.js";
 import { getDeviceName } from "/static/js/utils/getDeviceName.js";
 
 
-checkAuth("https://yumatsui.42.fr/home/", null);
+checkAuth("../home/", null);
 
 const translations = translations_format
 const lang = localStorage.getItem("selected_language") || 0;

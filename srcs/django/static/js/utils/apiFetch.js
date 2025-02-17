@@ -15,7 +15,7 @@ export async function handleLogout() {
     }
 
     try {
-        const response = await fetch("https://yumatsui.42.fr/authenticator/logout/", {
+        const response = await fetch("../authenticator/logout/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export async function handleLogout() {
     localStorage.removeItem("refresh_token");
 
     // 🔹 ログアウト後にログインページへリダイレクト
-    window.location.href = "https://yumatsui.42.fr/";
+    window.location.href = "../../";
 }
 
 

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import signup_view, verify_otp, qr_view, otp_view, login_view, check_auth, logout_view
 from rest_framework_simplejwt.views import TokenRefreshView
-from .render import landing_page, signup_page, login_page, home_page, setting_page, matchmaking_page
+from .render import landing_page, signup_page, login_page, home_page, setting_page, matchmaking_page, matchgame_page
 urlpatterns = [
     path("", landing_page, name="landing_page"),
     path('admin/', admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     path('home/', home_page, name='home_page'),
     path('home/setting/', setting_page, name='setting_page'),
     path('matchmaking/', matchmaking_page, name='matchmaking_page'),
+    path('match-game/<str:room_name>/', matchgame_page, name='matchgame_page'),
     path('authenticator/signup/', signup_view, name='signup'),
     path('authenticator/verify_otp/', verify_otp, name='verify_otp'),
     path('authenticator/qr/', qr_view, name='qr_view'),
