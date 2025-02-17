@@ -38,10 +38,34 @@ def get_user_info(request):
         "email": user.email,
         "language": user.language,
         "color": user.color,
-        "is_2fa_enabled": user.is_2fa_enabled
+        "is_2fa_enabled": user.is_2fa_enabled,
+        "profile_image": user.profile_image.url
     }
     
     return Response(user_data, status=200)
 
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    user = request.user
+    data = request.POST
+
+    print("🔍 受信データ:", data)  # デバッグ用
+    print("🔍 受信ファイル:", request.FILES)  # デバッグ用
+
+    password = data.get("password")
+    if not user.check_password(password):
+        return Response({"error": "Incorrect password"}, status=400)
+
+    user.username = data.get("username", user.username)
+    user.email = data.get("email", user.email)
+    user.language = data.get("language", user.language)
+
+    if "profile_image" in request.FILES:
+        user.profile_image = request.FILES["profile_image"]
+
+    user.save()
+    return Response({"message": "Profile updated successfully"}, status=200)
 
