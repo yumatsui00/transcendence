@@ -57,6 +57,7 @@ services:
     volumes:
       - ./srcs/frontend:/usr/share/nginx/html
       - ./srcs/django/staticfiles:/usr/share/nginx/html/static/
+      - ./srcs/django/media:/usr/share/nginx/html/media/
     networks:
       - TNet
 

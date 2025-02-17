@@ -1,34 +1,44 @@
-import { getUserInfo } from "./utils/getUserInfo.js";
+import { getUserInfo } from "/static/js/utils/getUserInfo.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
+import { translations_format } from "/static/js/utils/translations.js"
 
 checkAuth(null, "../");
 
+// intに変換
+const lang = parseInt(localStorage.getItem("language"), 10) || 0;
+const translations = translations_format[lang];
 
+
+document.getElementById("title").textContent = translations.gamemenu; // ゲームメニュータイトル
+document.getElementById("cpu-battle-btn").textContent = translations.cpumatch;
+document.getElementById("random-match-btn").textContent = translations.randommatch;
+document.getElementById("friend-battle-btn").textContent = translations.friendmatch;
+document.getElementById("settings-btn").textContent = translations.setting;
+document.getElementById("friend-list-btn").textContent = translations.friendlist;
+
+// ボタンのクリック処理
 function handleClick(page) {
     let url = '';
-
     switch (page) {
         case 'CPU Battle':
-            url = '/cpu-battle/'; // CPU対戦ページ
+            url = '/cpu-battle/';
             break;
         case 'Random Match':
-            url = '/matchmaking/'; // ランダムマッチページ
+            url = '/matchmaking/';
             break;
         case 'Friend Battle':
-            url = '/friend-battle/'; // 友人対戦ページ
+            url = '/friend-battle/';
             break;
         case 'Settings':
-            url = '/home/setting/'; // 設定ページ
+            url = '/home/setting/';
             break;
         case 'Friend List':
-            url = '/friend-list/'; // 友人一覧ページ
+            url = '/friend-list/';
             break;
         default:
             console.error('Unknown page:', page);
             return;
     }
-
-    // ページ遷移
     window.location.href = url;
 }
 

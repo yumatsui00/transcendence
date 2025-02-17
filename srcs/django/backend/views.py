@@ -216,6 +216,7 @@ def verify_otp(request):
         )
 
         return success_response("OTP verified successfully", {
+            "lang": user.language,
 			"access_token": str(refresh.access_token),
 			"refresh_token": str(refresh)
 		})
@@ -247,6 +248,7 @@ def login_view(request):
 		if not is_2fa_enabled:
 			refresh = RefreshToken.for_user(user)
 			return success_response("Login Success", {
+				"lang": user.language,
 				"requires_2fa": False,
 				"access_token": str(refresh.access_token),
 				"refresh_token": str(refresh)
@@ -271,6 +273,7 @@ def login_view(request):
 			print("信用されたデバイスとIPアドレス。2FA認証をスキップします")
 			refresh = valid_token.refresh_token
 			return success_response("Login Success", {
+				"lang": user.language,
 				"requires_2fa": False,
 				"access_token": str(refresh.access_token),
 				"refresh_token": refresh
@@ -301,3 +304,4 @@ def logout_view(request):
         return Response({"error": "Invalid refresh token", "detail": str(e)}, status=400)
 
     return Response({"message": "User logged out and deactivated"}, status=200)
+

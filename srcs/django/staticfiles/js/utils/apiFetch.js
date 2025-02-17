@@ -11,6 +11,7 @@ export async function handleLogout() {
         window.location.href = "../../";
 =======
 		localStorage.removeItem("user_info");
+        localStorage.removeItem("language");
 		globalUserInfo = null;
 
         window.location.href = "https://yumatsui.42.fr/";
@@ -48,53 +49,59 @@ export async function handleLogout() {
 
 
 export async function apiFetch(url, options = {}) {
-	const access_token = localStorage.getItem("access_token");
-	const refresh_token = localStorage.getItem("refresh_token");
+    const access_token = localStorage.getItem("access_token");
+    const refresh_token = localStorage.getItem("refresh_token");
 
-	if (!options.headers) {
-		options.headers = {};
-	}
-	if (access_token) {
-		options.headers["Authorization"] = `Bearer ${access_token}`;
-	}
-	options.headers["Content-Type"] = "application/json";
+    if (!options.headers) {
+        options.headers = {};
+    }
 
-	console.log("🔍 Sending API Request:", url);
+    // ✅ `FormData` の場合は `Content-Type` を自動設定しない
+    if (!(options.body instanceof FormData)) {
+        options.headers["Content-Type"] = "application/json";
+    }
+
+    if (access_token) {
+        options.headers["Authorization"] = `Bearer ${access_token}`;
+    }
+
+    console.log("🔍 Sending API Request:", url);
     console.log("🔍 Headers:", options.headers);
 
-    let response;
     try {
-        response = await fetch(url, options);
+        let response = await fetch(url, options);
+
+        // ✅ 401 (Unauthorized) ならアクセストークンの期限切れの可能性
         if (response.status === 401 && refresh_token) {
-			// refreshtokenがあるのに失敗→accesstoken期限切れの可能性
-            console.warn("🔄 access token has expired. Trying refresh token...");
+            console.warn("🔄 Access token expired. Trying refresh token...");
+
             const refreshResponse = await fetch("https://yumatsui.42.fr/authenticator/refresh/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refresh: refresh_token })
             });
+
             if (refreshResponse.ok) {
                 const refreshData = await refreshResponse.json();
-                // ✅ 新しいアクセストークンが取得できた場合のみ保存
                 if (refreshData.access) {
                     console.log("✅ Got a new access token, retrying request...");
                     localStorage.setItem("access_token", refreshData.access);
                     options.headers["Authorization"] = `Bearer ${refreshData.access}`;
-                    // ✅ もう一度 API リクエストを実行
+
+                    // ✅ アクセストークン更新後にもう一度 API リクエスト
                     response = await fetch(url, options);
                 } else {
                     console.error("🚨 Failed to get new access token, logging out...");
-                    handleLogout();
+                    handleLogoutSafely();
                     return response;
                 }
             } else {
-				// refreshtokenに問題あり
                 console.error("🚨 Refresh token expired or invalid. Logging out...");
-                handleLogout();
+                handleLogoutSafely();
                 return response;
             }
         }
-        // ✅ 401 以外のレスポンスはそのまま返す
+
         if (!response.ok) {
             console.error(`🚨 API Error: ${response.status} ${response.statusText}`);
         }
@@ -140,4 +147,13 @@ export async function apiFetch(url, options = {}) {
         return new Response(JSON.stringify({ error: "Network error" }), { status: 500 });
     }
 >>>>>>> main
+}
+
+// ✅ `handleLogout()` のエラー防止
+function handleLogoutSafely() {
+    if (typeof handleLogout === "function") {
+        handleLogout();
+    } else {
+        console.warn("⚠️ handleLogout() is not defined. Skipping logout.");
+    }
 }

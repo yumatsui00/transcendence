@@ -22,7 +22,8 @@ export async function loginflow(email, password, deviceName) {
         } else {
             //2FA認証が不必要→homeへ
             localStorage.setItem("access_token", loginData.access_token);
-            localStorage.getItem("refresh_token", loginData.refresh_token);
+            localStorage.setItem("refresh_token", loginData.refresh_token);
+            localStorage.setItem("language", loginData.lang);
             window.location.href = "https://yumatsui.42.fr/home/"
         }
     } else {
