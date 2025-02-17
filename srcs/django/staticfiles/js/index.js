@@ -1,8 +1,12 @@
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 import { translations_landingpage } from "/static/js/utils/translations.js"
 
+<<<<<<< HEAD
 checkAuth("/home/", null);
 
+=======
+checkAuth("https://yumatsui.42.fr/home/", null);
+>>>>>>> main
 const translations = translations_landingpage
 
 function updateLanguage(lang) {
@@ -25,4 +29,4 @@ document.getElementById('login').addEventListener('click', function() {
 });
 
 // Initialize with English
-updateLanguage('en');
+updateLanguage(0);

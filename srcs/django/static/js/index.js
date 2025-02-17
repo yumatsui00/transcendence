@@ -25,4 +25,4 @@ document.getElementById('login').addEventListener('click', function() {
 });
 
 // Initialize with English
-updateLanguage('en');
+updateLanguage(0);

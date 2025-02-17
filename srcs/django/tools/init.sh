@@ -20,7 +20,7 @@ echo "Migrating..."
 # python manage.py migrate --noinput  # すべてのマイグレーションを適用
 
 # 🔹 `app` のマイグレーションを適用
-python manage.py makemigrations api
+python manage.py makemigrations api --noinput
 python manage.py migrate --noinput 
 python manage.py collectstatic --noinput #static内のファイルをstaticfilesにコピー
 

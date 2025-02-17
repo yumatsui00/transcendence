@@ -1,3 +1,4 @@
+import { getUserInfo } from "./utils/getUserInfo.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 
 checkAuth(null, "../");

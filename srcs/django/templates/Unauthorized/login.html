@@ -13,16 +13,20 @@
     <div id="loading-screen">Loading...</div>
     <div class="container">
         <div class="login-container">
-            <h3 class="text-center">ログイン</h3>
+            <h3 id="login-label" class="text-center">ログイン</h3>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">メールアドレス</label>
+                    <label id="email-label" for="email">メールアドレス</label>
                     <input type="email" class="form-control" id="email" placeholder="example@mail.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">パスワード</label>
-                    <input type="password" class="form-control" id="password" placeholder="********" required>
+                    <label id="pass-label" for="password">パスワード</label>
+                    <input type="password" class="form-control" id="password" 
+                           placeholder="********" required
+                           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                           title="Password must be at least 8 characters long and include uppercase letters, lowercase letters, and numbers.">
                 </div>
+                
                 <button type="submit" class="btn btn-primary w-100">ログイン</button>
             </form>
             <p class="text-danger text-center mt-3" id="error-message" style="display: none;"></p>
