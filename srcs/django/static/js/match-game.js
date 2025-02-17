@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     camera.position.z = 4;
     camera.rotation.x = Math.PI / 6;
 
+    //台
     const boadGeometry = new THREE.BoxGeometry(5, 8, 0);
     const boadMaterial = new THREE.MeshBasicMaterial({ color: 0x0095DD });
     const boad = new THREE.Mesh(boadGeometry, boadMaterial);
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     boad.position.z = 0;
     scene.add(boad);
 
+    //横の壁
     const sideGeometry = new THREE.BoxGeometry(0.1, 8, 0.2);
     const sideMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
     const side1 = new THREE.Mesh(sideGeometry, sideMaterial);
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     side2.position.z = 0;
     scene.add(side2);
 
+    //中央の点線
     const dotGeometry = new THREE.BoxGeometry(0.2,0.1,0.01);
     const dotMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
     for (let i = 0; i < 17; i++) {
@@ -50,11 +53,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
         scene.add(dot);
     }
     
+    //ボール
     const radiusTop = 0.2; // 上面の半径
     const radiusBottom = 0.2; // 底面の半径
     const height = 0.2; // 高さ
     const radialSegments = 32; // 円周の分割数
-
     const cylinderGeometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
     const cylinderMaterial = new THREE.MeshStandardMaterial({ color: 0xDD3300  });
     const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
@@ -62,6 +65,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     cylinder.position.y = 4;
     scene.add(cylinder)
 
+    //ボールのエッジ
     const cylinderEdgeGeometory = new THREE.EdgesGeometry(cylinderGeometry);
     const cylinderEdgesMaterial = new THREE.LineBasicMaterial({ color: 0x8B0000});
     const cylinderEdge = new THREE.LineSegments(cylinderEdgeGeometory,cylinderEdgesMaterial);
@@ -69,24 +73,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
     cylinderEdge.rotation.copy(cylinder.rotation);
     scene.add(cylinderEdge);
 
+    //パドル
     const barGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.2);
     const barMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
     const bar1 = new THREE.Mesh(barGeometry, barMaterial);
+    const bar2 = new THREE.Mesh(barGeometry, barMaterial);
+    bar2.position.y = 7.8;
+    scene.add(bar2);
+    const barEdge2 = new THREE.LineSegments(barEdgeGeometory,barEdgesMaterial);
     bar1.position.y = 0.2;
     scene.add(bar1);
+    //パドルのエッジ
     const barEdgeGeometory = new THREE.EdgesGeometry(barGeometry);
     const barEdgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000});
     const barEdge1 = new THREE.LineSegments(barEdgeGeometory,barEdgesMaterial);
     barEdge1.position.copy(bar1.position);
     barEdge1.rotation.copy(bar1.rotation);
-    scene.add(barEdge1);
-
-    const bar2 = new THREE.Mesh(barGeometry, barMaterial);
-    bar2.position.y = 7.8;
-    scene.add(bar2);
-    const barEdge2 = new THREE.LineSegments(barEdgeGeometory,barEdgesMaterial);
     barEdge2.position.copy(bar2.position);
     barEdge2.rotation.copy(bar2.rotation);
+    scene.add(barEdge1);
     scene.add(barEdge2);
 
     function animate() {
