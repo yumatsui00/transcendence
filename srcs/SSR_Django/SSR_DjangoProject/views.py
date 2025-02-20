@@ -13,3 +13,4 @@ def signup_page(request):
 @permission_classes([AllowAny]) 
 def login_page(request):
     return render(request, "Unauthorized/login.html")
+

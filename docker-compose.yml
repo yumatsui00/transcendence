@@ -1,6 +1,20 @@
 name: "Transcendence"
 
 services:
+  api-gateway:
+    build:
+      context: srcs/API-Gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/API-Gateway:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/api-gateway:/etc/ssl/certs/api-gateway
+    restart: always
+    networks:
+      - TNet
   #---------------------------------------------------------------------
   auth-service:
     build:
@@ -150,11 +164,11 @@ services:
   #---------------------------------------------------------------------
   #---------------------------------------------------------------------
 
-  internal-api-gateway:
+  innerproxy:
     build:
-      context: srcs/API-Gateway/Internal
+      context: srcs/Proxy-Server/InnerProxy
       dockerfile: Dockerfile
-    container_name: internal-api-gateway
+    container_name: innerproxy
     depends_on:
       - auth-service
       - 2fa-service
@@ -164,18 +178,18 @@ services:
       - .env
     volumes:
       - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
-      - ./srcs/RootCA/certs/internal-api-gateway:/etc/ssl/certs/internal-api-gateway
+      - ./srcs/RootCA/certs/innerproxy:/etc/ssl/certs/innerproxy
     networks:
       - TNet 
 
   #---------------------------------------------------------------------
   #---------------------------------------------------------------------
 
-  public-api-gateway:
+  proxy:
     build:
-      context: srcs/API-Gateway/Public
+      context: srcs/Proxy-Server/Public
       dockerfile: Dockerfile
-    container_name: Public-API-Gateway
+    container_name: proxy
     ports:
       - "443:443"
     depends_on:
@@ -185,6 +199,7 @@ services:
       - ssr-django
       - static-server
       - user-image-server
+      - api-gateway
     env_file:
       - .env
     networks:

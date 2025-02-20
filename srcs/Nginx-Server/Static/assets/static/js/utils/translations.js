@@ -85,7 +85,7 @@ export const translations_format = {
         savechanges: "変更を保存",
         battlehistory: "戦歴",
         battlestats_description: "あなたのバトル統計と履歴がここに表示されます。",
-        username_length
+        // username_length
     },
     2: { // Français (French)
         signup: "S'inscrire",

@@ -44,12 +44,13 @@ generate_service_cert() {
 # 各サービスの証明書を作成
 generate_service_cert "user-service"
 generate_service_cert "auth-service"
-generate_service_cert "internal-api-gateway"
+generate_service_cert "innerproxy"
 generate_service_cert "2fa-service"
+generate_service_cert "api-gateway"
 
 echo "🔹 CA バンドルを作成..."
 cat $ROOT_CA_DIR/rootCA.crt \
-    $CERTS_DIR/internal-api-gateway/internal-api-gateway.crt \
+    $CERTS_DIR/innerproxy/innerproxy.crt \
     $CERTS_DIR/user-service/user-service.crt \
     $CERTS_DIR/auth-service/auth-service.crt \
     $CERTS_DIR/2fa-service/2fa-service.crt > $ROOT_CA_DIR/custom-ca-bundle.crt

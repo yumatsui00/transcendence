@@ -1,4 +1,4 @@
-"""SSR_DjangoProject URL Configuration
+"""API_Gateway URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -13,14 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
-from .views import landing_page, signup_page, login_page
+from .views import signup_view
 
 
 urlpatterns = [
-    path('', landing_page, name="landing_page"),
-    path('login', login_page, name="login_page"),
-    path('signup', signup_page, name="signup_page"),
-
+    path('api/signup/', signup_view, name="signup_view"),
 ]
