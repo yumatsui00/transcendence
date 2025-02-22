@@ -7,6 +7,9 @@ from .models import CustomUser
 import requests
 import os
 from django.conf import settings
+import json
+from django.utils.timezone import now
+from datetime import timedelta
 
 
 def error_response(message, status=400):
@@ -15,94 +18,82 @@ def error_response(message, status=400):
 def success_response(message, data={}):
     return JsonResponse({"success": True, "message": message, **data}, status=200)
 
-def ask_pass_check(password):
-    auth_service_url = os.getenv("AUTH_SERVICE_URL", "https://internal-api-gateway/auth")
-    pass_check_url = f"{auth_service_url}/password-check/"
-    try:
-        response = requests.post(pass_check_url, json={"password": password}, timeout=5)
-        return response.status_code
-    except requests.exceptions.RequestException as e:
-        print(f"Request error: {e}")
-        return None
-
-
-# authにuserid, passを登録する
-def ask_auth_register(data):
-    auth_service_url = os.getenv("AUTH_SERVICE_URL", "https://internal-api-gateway/auth")
-    auth_register_url = f"{auth_service_url}/register/"
-    try:
-        auth_response = requests.post(auth_register_url, json=data, timeout=5)
-        return auth_response.status_code
-    except requests.exceptions.RequestException:
-        return None
-
-# 2FAに登録
-def ask_2FA_register(data):
-    twoFA_serivice_url = os.getenv("2FA_SERVICE_URL", "https://internal-api-gateway/2fa")
-    twoFA_register_url = f"{twoFA_serivice_url}/register/"
-    try:
-        twoFA_response = requests.post(twoFA_register_url, json=data, timeout=5)
-        return twoFA_response.status_code
-    except requests.exceptions.RequestException:
-        return None
-
 #TODO
 def is_email_valid(email):
     return True
 
+
 @csrf_exempt
 @api_view(["POST"])
-@permission_classes([AllowAny])
-def signup_view(request):
-    username = request.data.get("username")
-    email = request.data.get("email")
-    password = request.data.get("password")
-    language = request.data.get("language")
-    is_2fa_enabled = bool(request.data.get("is_2fa_enabled", False))
+def CheckUserInfo(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get("username")
+        email = data.get("email")
 
-    if not username or not email or not password or language is None:
-        return error_response("All fields are required")
+        if not username or not email:
+            return error_response("username or email is missing")
+        if len(username) > 10:
+            return error_response("username too long")
+        if not is_email_valid(email):
+            return error_response("Invalid email")
 
-    if len(username) > 10:
-        return error_response("Username too long")
-    if not is_email_valid(email):
-        return error_response("Inavlid email")
+        # username, email の重複チェック
+        if CustomUser.objects.filter(username=username).exists():
+            return error_response("Username already exists")
+        if CustomUser.objects.filter(email=email).exists():
+            return error_response("Email already exists")
+        return success_response("username and email are valid. You can sign up with them")
+    except Exception as e:
+        return error_response(str(e))
 
-    # username, email の重複チェック
-    if CustomUser.objects.filter(username=username).exists():
-        return error_response("Username already exists")
-    if CustomUser.objects.filter(email=email).exists():
-        return error_response("Email already exists")
+@csrf_exempt
+@api_view(["POST"])
+def RegisterUserInfo(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get("username")
+        email = data.get("email")
+        language = data.get("language")
 
+        if not username or not email or not language:
+            return error_response("username or email is missing")
+        if len(username) > 10:
+            return error_response("username too long")
+        if not is_email_valid(email):
+            return error_response("Invalid email")
+        if CustomUser.objects.filter(username=username).exists():
+            return error_response("Username already exists")
+        if CustomUser.objects.filter(email=email).exists():
+            return error_response("Email already exists")
+        
+        user = CustomUser.objects.create(username=username, email=email, language=language, color=0)
+        return success_response("the user is registered successfully", data={"userid": user.id})
+    except Exception as e:
+        return error_response(str(e))
 
-    # password チェック
-    status = ask_pass_check(password)
-    if status != 200:
-        if status is None:
-            error_response("Auth-Service unreachable", status=500)
-        return error_response("Invalid Password")
+@csrf_exempt
+@api_view(["POST"])
+def InitialDeleteUserInfo(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get("username")
+        email = data.get("email")
+        userid = data.get("userid")
+        password = data.get("password")
 
-
-    user = CustomUser.objects.create(username=username, email=email, language=language, color=0)
-    # auth-serviceへの登録
-    data = {"userid": user.id, "password": password}
-    status = ask_auth_register(data)
-    if status != 200:
+        if password != settings.INITDELAUTHINFOPASS:
+            return error_response("Unauthorized request", status=403)
+        if (now() - user.date_joined) > timedelta(minutes=3):
+            return error_response("Deletion time window expired.", status=403)
+        user = CustomUser.objects.filter(id=userid, username=username, email=email).first()
+        if not user:
+            return error_response("User not found. Who are you?", status=404)
         user.delete()
-        if status is None:
-            return error_response("Auth-Service unreachable", status=500)
-        return error_response("Invalid password when signing up")
+        return success_response("user deleted successfully")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
-    data = {"userid":user.id, "is_2fa_enabled": is_2fa_enabled, "email": email}
-    status = ask_2FA_register(data)
-    # return error_response("stat", status=status)
-    is_2fa_success = True
-    if status is None or status != 200:
-        is_2fa_success = False
-
-    return success_response("User registered successfully", {
-        "userid": user.id,
-        "is_2fa_enabled": is_2fa_enabled,
-        "is_2fa_success": is_2fa_success,
-    })
 

@@ -16,11 +16,14 @@ Including another URLconf
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import signup_view
+from .views import CheckUserInfo, RegisterUserInfo, InitialDeleteUserInfo
 
 urlpatterns = [
-    path('user/signup/', signup_view, name="signup_view"),
+    path('check-user-info/', CheckUserInfo, name="CheckUserInfo"),
+    path('register-user-info/', RegisterUserInfo, name="RegisterUserInfo"),
+    path('inital-delete-user-info/', InitialDeleteUserInfo, name="InitialDeleteUserInfo"),
 ]
+
 
 # Django で `MEDIA_URL` を serve しない (Nginx に任せる)
 if settings.DEBUG:

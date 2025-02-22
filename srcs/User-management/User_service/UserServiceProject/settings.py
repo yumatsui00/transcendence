@@ -137,7 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
 os.environ["REQUESTS_CA_BUNDLE"] = CERT_PATH
-
+INITDELAUTHINFOPASS = os.environ.get("INITDELAUTHINFOPASS", "password")
 # Nginx 経由で画像を配信
 MEDIA_URL = "https://User-Image-Server/media/"
 MEDIA_ROOT = "/app/media/"  # 画像ファイルを保存するディレクトリ

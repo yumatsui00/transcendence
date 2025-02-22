@@ -129,6 +129,8 @@ USE_L10N = True
 USE_TZ = True
 
 CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
+
+
 os.environ["REQUESTS_CA_BUNDLE"] = CERT_PATH
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

@@ -18,5 +18,5 @@ from .views import password_check, register
 
 urlpatterns = [
     path("password-check/", password_check, name="password-check"),
-    path("register/", register, name="register"),
+    path("register-auth-info/", register, name="register"),
 ]

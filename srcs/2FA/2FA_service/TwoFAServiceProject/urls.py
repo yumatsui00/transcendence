@@ -18,6 +18,6 @@ from django.urls import path
 from .views import register
 
 urlpatterns = [
-    path("register/", register, name="register-2fa"),
+    path("register-2fa-info/", register, name="register-2fa"),
 ]
 

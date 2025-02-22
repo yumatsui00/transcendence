@@ -118,7 +118,7 @@ CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+INITDELAUTHINFOPASS = os.environ.get("INITDELAUTHINFOPASS", "password")
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

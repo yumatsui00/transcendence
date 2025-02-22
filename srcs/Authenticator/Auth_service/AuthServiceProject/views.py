@@ -34,8 +34,12 @@ def register(request):
     password = data.get("password")
     if not password or not validate_password(password):
         return error_response("Invalid password")
+    if not userid:
+        return error_response("couldn't assign user id for some reasons")
     auth_user = AuthUser(userid=userid)
     auth_user.set_password(password)
     auth_user.save()
 
     return success_response("User Registered successfully")
+
+    
