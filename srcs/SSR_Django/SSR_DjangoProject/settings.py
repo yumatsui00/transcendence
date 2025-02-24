@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -31,7 +32,7 @@ DOMAIN = os.environ.get("DOMAIN", "localhost") #ない場合はlocalhost
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["django", DOMAIN]
+ALLOWED_HOSTS = ["django", DOMAIN, "innerproxy"]
 
 
 # Application definition
@@ -40,14 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',  # 静的ファイルの管理に必要
     'django.contrib.auth',  # テンプレートコンテキストプロセッサで使われている
     'django.contrib.contenttypes',  # Django の認証システムに必要
+    'rest_framework',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 
 ROOT_URLCONF = 'SSR_DjangoProject.urls'
@@ -109,6 +111,7 @@ STATIC_URL = f"https://{DOMAIN}/static/"
 MEDIA_URL = f"https://{DOMAIN}/media/"
 STATICFILES_DIRS = [] 
 
+CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

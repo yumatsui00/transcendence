@@ -12,6 +12,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 
+
 def error_response(message, status=400):
     return JsonResponse({"success": False, "message": message}, status=status)
 
@@ -66,8 +67,9 @@ def RegisterUserInfo(request):
             return error_response("Username already exists")
         if CustomUser.objects.filter(email=email).exists():
             return error_response("Email already exists")
-        
+
         user = CustomUser.objects.create(username=username, email=email, language=language, color=0)
+        user.save()
         return success_response("the user is registered successfully", data={"userid": user.id})
     except Exception as e:
         return error_response(str(e))
@@ -96,4 +98,25 @@ def InitialDeleteUserInfo(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+
+@csrf_exempt
+@api_view(["POST"])
+def GetUserIDbyEmail(request):
+    try:
+        data = json.loads(request.body)
+        email = data.get("email")
+
+        if not email or not is_email_valid(email):
+            return error_response("Invalid email")
+        user = CustomUser.objects.filter(email=email).first()
+
+        if not user:
+            return error_response("User not found")
+
+        return success_response("User found", data={"userid": user.id})
+    except json.JSONDecodeError:
+        return error_response("Invalid JSON format")
+    except Exception as e:
+        print(f"Error: {e}")  # ✅ エラーログを追加
+        return error_response(str(e))
 

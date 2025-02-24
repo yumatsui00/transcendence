@@ -155,8 +155,11 @@ services:
       - .env
     volumes:
       - ./srcs/SSR_Django:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/ssr-django:/etc/ssl/certs/ssr-django
     depends_on:
       - user-service
+    restart: always
     networks:
       - TNet
 
@@ -200,6 +203,7 @@ services:
       - static-server
       - user-image-server
       - api-gateway
+    restart: always
     env_file:
       - .env
     networks:

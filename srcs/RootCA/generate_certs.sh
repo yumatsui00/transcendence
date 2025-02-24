@@ -47,12 +47,14 @@ generate_service_cert "auth-service"
 generate_service_cert "innerproxy"
 generate_service_cert "2fa-service"
 generate_service_cert "api-gateway"
+generate_service_cert "ssr-django"
 
 echo "🔹 CA バンドルを作成..."
 cat $ROOT_CA_DIR/rootCA.crt \
     $CERTS_DIR/innerproxy/innerproxy.crt \
     $CERTS_DIR/user-service/user-service.crt \
     $CERTS_DIR/auth-service/auth-service.crt \
+    $CERTS_DIR/ssr-django/ssr-django.crt \
     $CERTS_DIR/2fa-service/2fa-service.crt > $ROOT_CA_DIR/custom-ca-bundle.crt
 echo "✅ CA バンドル作成完了！"
 

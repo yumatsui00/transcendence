@@ -117,3 +117,4 @@ function handleLogoutSafely() {
         console.warn("⚠️ handleLogout() is not defined. Skipping logout.");
     }
 }
+

@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import landing_page, signup_page, login_page
+from .views import landing_page, signup_page, login_page, get_qr_page, home_view
 
 
 urlpatterns = [
     path('', landing_page, name="landing_page"),
     path('login', login_page, name="login_page"),
     path('signup', signup_page, name="signup_page"),
+    path('get_qr/<str:userid>/<str:qr_url>', get_qr_page, name="qr_page"),
 
+    path("home/", home_view, name="home_page"),  # ✅ JWTチェック → `/home/<userid>/` にリダイレクト
+#     path("home/<int:userid>/", home_page_with_userid, name="home_page_with_userid"),
 ]

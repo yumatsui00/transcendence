@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-($(3wfb$=2!7px(c9&_6bsum$=$2y7)uhx^)0v7fmp2q%)xof9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DOMAIN = os.environ.get("DOMAIN", "localhost") 
-ALLOWED_HOSTS = [DOMAIN, "django", "innerproxy", "user-service"]
+ALLOWED_HOSTS = [DOMAIN, "django", "innerproxy", "user-service", "proxy", "localhost"]
 
 AUTH_USER_MODEL = "UserServiceProject.CustomUser"
 

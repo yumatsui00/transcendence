@@ -1,32 +1,34 @@
 export async function loginflow(email, password, deviceName) {
-    const loginResponse = await fetch("https://yumatsui.42.fr/authenticator/login/", {
+    const loginResponse = await fetch("https://yumatsui.42.fr/api/login/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email: email, password: password, device: deviceName })
+        body: JSON.stringify({ email: email, password: password, device_name: deviceName })
     })
     if (loginResponse.ok) {
         const loginData = await loginResponse.json();
-        if (loginData.requires_2fa) {
-            // 2FA認証が必要
-            if (loginData.is_registered_once) {
-                // 2FA認証を行ったことがある→OTP入力へ
-                alert("OTP入力へ")
-                window.location.href = `https://yumatsui.42.fr/authenticator/otp/?email=${encodeURIComponent(email)}`;
+        console.log(loginData)
+        if (loginData.is_2fa_needed) {
+            // 2FA認証が必要(qr_urlがNoneじゃない)
+            const userid = loginData.userid
+            if (loginData.qr_url) {
+                const qrUrlEncoded = btoa(loginData.qr_url);
+                alert("qr_表示用ページへ")
+                window.location.href = `https://yumatsui.42.fr/get_qr/${userid}/${qrUrlEncoded}`
             } else {
-                alert("2FA認証へ")
-                // 2FA認証を行ったことがない→qr登録へ
-                window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(email)}`;
+                alert("OTPへ")
+                
             }
         } else {
-            //2FA認証が不必要→homeへ
+            const userid = loginData.userid
             localStorage.setItem("access_token", loginData.access_token);
             localStorage.setItem("refresh_token", loginData.refresh_token);
             localStorage.setItem("language", loginData.lang);
-            window.location.href = "https://yumatsui.42.fr/home/"
+            window.location.href = `https://yumatsui.42.fr/pages/home/`
         }
     } else {
+        console.error(loginResponse.message)
         alert("ログイン失敗！")
     }
 }

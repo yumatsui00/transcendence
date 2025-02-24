@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,7 +46,28 @@ INSTALLED_APPS = [
     'rest_framework',  # Django REST Framework を追加
     'corsheaders',# CORS を許可する
     'AuthServiceProject',
+    'rest_framework_simplejwt',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+SIMPLE_JWT = {
+    "USER_ID_FIELD": "userid",
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.getenv("JWT_SECRET_KEY", "your-secret-key"),  # 環境変数にするのがベスト
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,6 +100,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'AuthServiceProject.wsgi.application'
 
+AUTH_USER_MODEL = "AuthServiceProject.AuthUser"  # ✅ `myapp` を `AuthUser` を定義したアプリ名に変更
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

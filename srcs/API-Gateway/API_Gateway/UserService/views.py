@@ -26,9 +26,7 @@ def RegisterUserInfo(username, email, language):
     data = {"username": username, "email": email, "language": language}
     try:
         response = requests.post(url, json=data)
-        message = response.json().get("message", "Something went wrong")
-        userid = response.json().get("userid")
-        return response.status_code, message, userid
+        return response.status_code, response.json().get("message", "Something went wrong"), response.json().get("userid")
     except requests.RequestException as e:
         return None, str(e), -1
 
@@ -36,4 +34,13 @@ def InitialDeleteUserInfo(userid, username, email, password):
     url = "https://innerproxy/user/inital-delete-user-info/"
     data = {"userid": userid, "usename": username, "email": email,"password": password}
     return normal_request(url, data)
+
+def getUserIDbyEmail(email):
+    url = "https://innerproxy/user/get-id-by-email/"
+    data = {"email": email}
+    try:
+        response = requests.post(url, json=data)
+        return response.status_code, response.json().get("userid"), response.json().get("message", "something went wrong")
+    except requests.RequestException as e:
+        return None, None, str(e)
 

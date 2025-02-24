@@ -14,9 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from .views import signup_view
-
+from .views import signup_view, login_view
+from .SSR_Django.views import home_page
+# from .twoFAService.views import generate_qr_view
 
 urlpatterns = [
     path('api/signup/', signup_view, name="signup_view"),
+    path('api/login/', login_view, name="login_view"),
+
+    # SSR-Django用。COOKIE保存のため認証ページはapigateway経由
+    path('pages/home/', home_page, name="home_page")
 ]

@@ -1,4 +1,4 @@
-// import { loginflow } from "./utils/loginflow.js";
+import { loginflow } from "/static/js/utils/loginflow.js";
 // import { checkAuth } from "/static/js/utils/checkAuth.js";
 import { translations_format } from "/static/js/utils/translations.js";
 import { getDeviceName } from "/static/js/utils/getDeviceName.js";
@@ -27,7 +27,8 @@ async function signupflow(username, email, password, is_2fa_enabled, language, d
         const data = await response.json()
         messageBox.textContent = data.message;
         if (response.ok) {
-            //login flow
+            deviceName = getDeviceName()
+            loginflow(email, password, deviceName)
         }
     } catch (error) {
         console.error("Error: ", error);
