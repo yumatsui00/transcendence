@@ -16,11 +16,11 @@ document.getElementById('language').addEventListener('change', function() {
 });
 
 document.getElementById('signup').addEventListener('click', function() {
-    window.location.href = '/signup'
+    window.location.href = '/signup/'
 });
 
 document.getElementById('login').addEventListener('click', function() {
-    window.location.href = '/login'
+    window.location.href = '/login/'
 });
 
 // Initialize with English

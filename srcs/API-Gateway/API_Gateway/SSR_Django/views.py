@@ -5,54 +5,69 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 import requests
 import os
+from django.shortcuts import redirect
+
+def is_authorized(request):
+    access_token = request.COOKIES.get("access_token")
+    if not access_token:
+        return False, None
+    headers = {"Authorization": f"Bearer {access_token}"}
+    auth_response = requests.get("https://innerproxy/auth/check-jwt/", headers=headers)
+    if auth_response.status_code == 200:
+        return True, access_token
+    refresh_token = request.COOKIES.get("refresh_token")
+    if not refresh_token:
+        return False, None
+    refresh_response = request.get("https://innerproxy/auth/refresh/", json={"refresh_token": refresh_token})
+    if refresh_response.status_code == 200:
+        new_access_token = refresh_response.json().get("access_token")
+        return True, new_access_token
+    return False, None
 
 
-def error_response(message, status=400):
-    return JsonResponse({"success": False, "message": message}, status=status)
+def django_render(url):
+    ssr_response = requests.get(url)
+    return HttpResponse(ssr_response.content, status=ssr_response.status_code)
 
-def error_response_from_other_service(message, ret_status):
-    if ret_status is None:
-        return error_response(message, status=500)
-    return error_response(message, status=400)
-    
+def landing_page_view(request):
+    status, access_token =is_authorized(request)
+    if status is False or access_token is None:
+        return django_render("https://innerproxy/")
+    return redirect("https://yumatsui.42.fr/pages/home/")
 
-def success_response(message, data={}):
-    return JsonResponse({"success": True, "message": message, **data}, status=200)
+def signup_page_view(request):
+    status, access_token =is_authorized(request)
+    if status is False or access_token is None:
+        return django_render("https://innerproxy/signup")
+    return redirect("https://yumatsui.42.fr/pages/home/")
 
-# def checkJWT(request):
+def login_page_view(request):
+    status, access_token =is_authorized(request)
+    if status is False or access_token is None:
+        return django_render("https://innerproxy/login")
+    return redirect("https://yumatsui.42.fr/pages/home/")
+
+# def auth_render(request, url):
 #     access_token = request.COOKIES.get("access_token")
 #     if not access_token:
-#         return 403, None
+#         return JsonResponse({"error": "Unauthorized"}, status=401)
 
+#     # ✅ API Gateway が `SSR-Django` にリクエストを送る
 #     headers = {"Authorization": f"Bearer {access_token}"}
-#     auth_response = requests.get("https://innerproxy/auth/check-jwt", headers=headers)
-
-#     if auth_response.status == 200:
-#         userid = auth_response.json().get("userid")
-#         return 200, userid
-
-#     refresh_token = request.COOKIES.get("refresh_token")
-#     if refresh_token:
-#         refresh_response = request.get("https://innerproxy/auth/refresh", json={"refresh_token": refresh_token})
-#         if refresh_response.status_code == 200:
-#             new_access_token = refresh_response.json().get("access_token")
-#             new_headers = {"Authorization": f"Bearer {new_access_token}"}
-#             retry_response = requests.get("https://innerproxy/auth/check-jwt", headers=new_headers)
-#             if retry_response.status_code == 200:
-#                 userid = retry_response.json().get("userid")
-#                 return 200, userid
-#     return 403, None
-
+#     ssr_response = requests.get(url, headers=headers)
+#     # ✅ `SSR-Django` のレスポンスをそのまま返す
+#     return HttpResponse(ssr_response.content, status=ssr_response.status_code)
 
 def home_page(request):
-    access_token = request.COOKIES.get("access_token")
-    
-    if not access_token:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
+    status, access_token = is_authorized(request)
+    if status is False or access_token is None:
+        return redirect("https://yumatsui.42.fr")
+    return django_render("https://innerproxy/pages/home/")
 
-    # ✅ API Gateway が `SSR-Django` にリクエストを送る
-    headers = {"Authorization": f"Bearer {access_token}"}
-    ssr_response = requests.get("https://innerproxy/pages/home/", headers=headers)
 
-    # ✅ `SSR-Django` のレスポンスをそのまま返す
-    return HttpResponse(ssr_response.content, status=ssr_response.status_code)
+def setting_page(request):
+    status, access_token = is_authorized(request)
+    if status is False or access_token is None:
+        return redirect("https://yumatsui.42.fr")
+    return django_render("https://innerproxy/pages/setting/")
+

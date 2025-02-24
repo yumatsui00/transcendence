@@ -1,0 +1,76 @@
+/* 基本設定 */
+body {
+    background-color: #f4f7f6;
+    font-family: 'Arial', sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ローディング画面 */
+#loading-screen {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 100vh;
+    color: #333;
+}
+
+/* プロフィール画像 */
+#profileImage {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+#profileImage:hover {
+    transform: scale(1.1);
+}
+
+/* ボタンのスタイル */
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* 入力フィールド */
+input, select {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    width: 100%;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* 戦闘履歴のカード */
+#battlehistory {
+    font-size: 1.2rem;
+}
+
+.inner {
+    min-height: 100px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}

@@ -24,24 +24,12 @@ def get_qr_page(request, userid, qr_url):
     decoded_qr_url = base64.b64decode(qr_url).decode('utf-8')  # URLデコード
     return render(request, "Unauthorized/qr.html", {"userid": userid, "qr_url": decoded_qr_url})
 
+
 @api_view(["GET"])
 def home_view(request):
-    auth_header = request.headers.get("Authorization")
-    print(f"Authorization Header: {auth_header}")  
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return JsonResponse({"error": "Unauthorized"}, status=401)
+    return render(request, "Authorized/home.html")
 
-    access_token = auth_header.split(" ")[1]
-    headers = {"Authorization": f"Bearer {access_token}"}
+@api_view(["GET"])
+def setting_view(request):
+    return render(request, "Authorized/setting.html")
 
-    
-    # ✅ Auth に `access_token` を送信し、レスポンスを取得
-    auth_response = requests.get("https://innerproxy/auth/check-jwt/", headers=headers, verify=False)
-
-    if auth_response.status_code == 200:
-        auth_data = auth_response.json() 
-        userid = auth_data.get("userid")
-        
-        return render(request, "Authorized/home.html", {"userid": userid})
-
-    return JsonResponse({"error": "Unauthorized"}, status=401)

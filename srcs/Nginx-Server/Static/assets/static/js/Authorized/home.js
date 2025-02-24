@@ -2,7 +2,7 @@ import { getUserInfo } from "/static/js/utils/getUserInfo.js";
 import { checkAuth } from "/static/js/utils/checkAuth.js";
 import { translations_format } from "/static/js/utils/translations.js"
 
-checkAuth(null, "https://yumatsui.42.fr/");
+// checkAuth(null, "https://yumatsui.42.fr/");
 
 // intに変換
 const lang = parseInt(localStorage.getItem("language"), 10) || 0;
@@ -30,7 +30,7 @@ function handleClick(page) {
             url = '/friend-battle/';
             break;
         case 'Settings':
-            url = '/home/setting/';
+            url = '/pages/setting/';
             break;
         case 'Friend List':
             url = '/friend-list/';

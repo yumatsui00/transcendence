@@ -111,9 +111,24 @@ def login_view(request):
         response = JsonResponse({"message": "Login successful", "is_2fa_needed": False }) 
         response = set_cookie(response, "access_token", access_token)
         response = set_cookie(response, "refrefh_token", refresh_token)
-        response = set_cookie(response, "userid", userid)
         return response
 
     return success_response("2FA auth is needed", data={"userid": userid, "is_2fa_needed": is_2fa_needed,"qr_url": qr_url})
 
 
+
+@api_view(["POST"])
+def logout_view(request):
+    access_token = request.COOKIES.get("access_token")
+    if not access_token:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    headers = {"Authorization": f"Bearer {access_token}"}
+    auth_response = requests.get("https://innerproxy/auth/check-jwt/", headers=headers)
+
+    if auth_response.status_code == 200:
+        response = JsonResponse({"message": "successfully logged out"}, status=200)
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+        return response
+
+    return JsonResponse({"error": "Unauthorized"}, status=401)
