@@ -189,6 +189,8 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [("redis://redis:6379")],
+            "capacity": 1500,  # キューの容量を増やす
+            "expiry": 10,
         },
     },
 }

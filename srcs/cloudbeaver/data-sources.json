@@ -4,7 +4,7 @@
 		"trascenPostgresDBL": {
 			"provider": "postgresql",
 			"driver": "postgres-jdbc",
-			"name": "Trascen PostgreSQL Database",
+			"name": "MY PostgreSQL Database",
 			"configuration": {
 				"host": "postgres",
 				"port": "5432",

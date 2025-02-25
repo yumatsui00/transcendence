@@ -23,9 +23,11 @@ def setting_page(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def matchmaking_page(request):
     return render(request, "authorized/matchmaking.html")
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def matchgame_page(request, room_name):
     return render(request, "authorized/match-game.html", {'room_name': room_name})
