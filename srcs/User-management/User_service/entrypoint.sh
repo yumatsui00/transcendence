@@ -21,6 +21,15 @@ echo "Migrating..."
 python manage.py makemigrations UserServiceProject --noinput
 python manage.py migrate --noinput
 
+certfile="/etc/ssl/certs/user-service/user-service.crt"
+keyfile="/etc/ssl/certs/user-service/user-service.key"
+
+# 証明書ファイルとキーが存在するまで待機
+until [ -f "$certfile" ] && [ -f "$keyfile" ]; do
+  echo "Waiting for $certfile and $keyfile to be created..."
+  sleep 1
+done
+
 echo "✅ Starting User-service with HTTPS..."
 exec gunicorn \
     --certfile=/etc/ssl/certs/user-service/user-service.crt \

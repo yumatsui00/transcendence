@@ -16,5 +16,14 @@ mkdir -p /etc/nginx/ssl
 #     cp /etc/nginx/ssl/trascen.crt /etc/nginx/ssl/volume/trascen.crt
 # fi
 
+certfile="/etc/ssl/certs/innerproxy/innerproxy.crt"
+keyfile="/etc/ssl/certs/innerproxy/innerproxy.key"
+
+# 証明書ファイルとキーが存在するまで待機
+until [ -f "$certfile" ] && [ -f "$keyfile" ]; do
+  echo "Waiting for $certfile and $keyfile to be created..."
+  sleep 1
+done
+
 # Nginx を起動
 nginx -g "daemon off;"

@@ -19,6 +19,15 @@ echo "Migrating..."
 python manage.py makemigrations TwoFAServiceProject --noinput
 python manage.py migrate --noinput
 
+certfile="/etc/ssl/certs/2fa-service/2fa-service.crt"
+keyfile="/etc/ssl/certs/2fa-service/2fa-service.key"
+
+# 証明書ファイルとキーが存在するまで待機
+until [ -f "$certfile" ] && [ -f "$keyfile" ]; do
+  echo "Waiting for $certfile and $keyfile to be created..."
+  sleep 1
+done
+
 echo "✅ Starting 2FA-service with HTTPS..."
 exec gunicorn \
     --certfile=/etc/ssl/certs/2fa-service/2fa-service.crt \
