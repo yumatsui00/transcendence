@@ -1,65 +1,256 @@
 name: "Transcendence"
 
 services:
-  django:
+  api-gateway:
     build:
-      context: srcs/django
+      context: srcs/API-Gateway
       dockerfile: Dockerfile
-    container_name: DJANGO
+    container_name: api-gateway
     env_file:
       - .env
-    ports:
-      - "8000:442"
     volumes:
-      - ./srcs/django:/app
+      - ./srcs/API-Gateway:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/api-gateway:/etc/ssl/certs/api-gateway
+    restart: always
+    networks:
+      - TNet
+  #---------------------------------------------------------------------
+  auth-service:
+    build:
+      context: srcs/Authenticator/Auth_service
+      dockerfile: Dockerfile
+    container_name: Auth-service
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/Authenticator/Auth_service:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/auth-service:/etc/ssl/certs/auth-service
+    restart: always
     depends_on:
-      - postgres
+      - auth-db
+    networks:
+      - TNet
+
+  auth-db:
+    build:
+      context: srcs/Authenticator/Auth_DB
+      dockerfile: Dockerfile
+    container_name: Auth-DB
+    environment:
+      POSTGRES_DB: ${POSTGRES_AUTH_DB}
+      POSTGRES_USER: ${POSTGRES_AUTH_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_AUTH_PASSWORD}
+    volumes:
+      - ./srcs/Authenticator/Auth_DB/data:/var/lib/postgresql/data
+    networks:
+      - TNet
+    restart: always
+
+  # #---------------------------------------------------------------------
+  # #---------------------------------------------------------------------
+
+  2fa-service:
+    build:
+      context: srcs/2FA/2FA_service
+      dockerfile: Dockerfile
+    container_name: 2FA-service
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/2FA/2FA_service:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/2fa-service:/etc/ssl/certs/2fa-service
+    restart: always
+    depends_on:
+      - 2fa-db
+    networks:
+      - TNet
+
+  2fa-db:
+    build:
+      context: srcs/2FA/2FA_DB
+      dockerfile: Dockerfile
+    container_name: 2FA-DB
+    environment:
+      POSTGRES_DB: ${POSTGRES_2FA_DB}
+      POSTGRES_USER: ${POSTGRES_2FA_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_2FA_PASSWORD}
+    volumes:
+      - ./srcs/2FA/2FA_DB/data:/var/lib/postgresql/data
+    networks:
+      - TNet
+    restart: always
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+
+  user-service:
+    build:
+      context: srcs/User-management/User_service
+      dockerfile: Dockerfile
+    container_name: User-Service
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/User-management/User_service:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/user-service:/etc/ssl/certs/user-service
+    restart: always
+    depends_on:
+      - user-db
+    networks:
+      - TNet
+
+  user-db:
+    build:
+      context: srcs/User-management/User_DB
+      dockerfile: Dockerfile
+    container_name: User-DB
+    environment:
+      POSTGRES_DB: ${POSTGRES_USER_DB}
+      POSTGRES_USER: ${POSTGRES_USER_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_USER_PASSWORD}
+    volumes:
+      - ./srcs/User-management/User_DB/data:/var/lib/postgresql/data
+    networks:
+      - TNet
+    restart: always
+
+  user-image-server:
+    build:
+      context: srcs/Nginx-Server/User-Image
+      dockerfile: Dockerfile
+    container_name: User-Image-Server
+    volumes:
+      - ./srcs/Nginx-Server/User-Image/assets/media:/usr/share/nginx/html/media
+    depends_on:
+      - user-service
+    networks:
+      - TNet
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+
+  static-server:
+    build:
+      context: srcs/Nginx-Server/Static
+      dockerfile: Dockerfile
+    container_name: Static-Server
+    volumes:
+      - ./srcs/Nginx-Server/Static/assets/static:/usr/share/nginx/html/static
+    networks:
+      - TNet
+
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+  ssr-django:
+    build:
+      context: srcs/SSR_Django
+      dockerfile: Dockerfile
+    container_name: SSR-django
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/SSR_Django:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/ssr-django:/etc/ssl/certs/ssr-django
+    depends_on:
+      - user-service
+    restart: always
+    networks:
+      - TNet
+
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+
+  innerproxy:
+    build:
+      context: srcs/Proxy-Server/InnerProxy
+      dockerfile: Dockerfile
+    container_name: innerproxy
+    depends_on:
+      - auth-service
+      - 2fa-service
+      - user-service
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/innerproxy:/etc/ssl/certs/innerproxy
+    networks:
+      - TNet 
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+
+  proxy:
+    build:
+      context: srcs/Proxy-Server/Public
+      dockerfile: Dockerfile
+    container_name: proxy
+    ports:
+      - "443:443"
+    depends_on:
+      - auth-service
+      - 2fa-service
+      - user-service
+      - ssr-django
+      - static-server
+      - user-image-server
+      - api-gateway
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - TNet 
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+  root-ca:
+    build:
+      context: srcs/RootCA
+      dockerfile: Dockerfile
+    container_name: RootCA
+    volumes:
+      - ./srcs/RootCA/certs:/certs
+    networks: []
+
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+
+  websocket:
+    build:
+      context: srcs/Websocket
+      dockerfile: Dockerfile
+    container_name: websocket
+    volumes:
+      - ./srcs/Websocket:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/websocket:/etc/ssl/certs/websocket
+    depends_on:
       - redis
     networks:
       - TNet
 
   redis:
     build:
-      context: srcs/redis
+      context: srcs/Redis
       dockerfile: Dockerfile
     container_name: REDIS
-    ports:
-      - "6379:6379"
+    volumes:
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/redis:/etc/ssl/certs/redis
     networks:
       - TNet
 
-  postgres:
-    build:
-      context: srcs/postgres
-      dockerfile: Dockerfile
-    container_name: POSTGRES
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./srcs/postgres/data:/var/lib/postgresql/data
-    networks:
-      - TNet
-    restart: always
-
-  nginx:
-    build:
-      context: srcs/nginx
-      dockerfile: Dockerfile
-    container_name: NGINX
-    ports:
-      - "443:443"
-    depends_on:
-      - django
-    env_file:
-      - .env
-    volumes:
-      - ./srcs/frontend:/usr/share/nginx/html
-      - ./srcs/django/staticfiles:/usr/share/nginx/html/static/
-      - ./srcs/django/media:/usr/share/nginx/html/media/
-    networks:
-      - TNet
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
 
   # dbeaver:
   #   build:
