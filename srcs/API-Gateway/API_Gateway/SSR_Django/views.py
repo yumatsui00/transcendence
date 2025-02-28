@@ -71,3 +71,14 @@ def setting_page(request):
         return redirect("https://yumatsui.42.fr")
     return django_render("https://innerproxy/pages/setting/")
 
+def matchmaking_page(request):
+    status, access_token = is_authorized(request)
+    if status is False or access_token is None:
+        return redirect("https://yumatsui.42.fr")
+    return django_render("https://innerproxy/pages/matchmaking/")
+
+def matchgame_page(request, room_name):
+    status, access_token = is_authorized(request)
+    if status is False or access_token is None:
+        return redirect("https://yumatsui.42.fr")
+    return django_render(f"https://innerproxy/pages/match-game/{room_name}/")

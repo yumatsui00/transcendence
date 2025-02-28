@@ -24,7 +24,7 @@ function handleClick(page) {
             url = '/cpu-battle/';
             break;
         case 'Random Match':
-            url = '/matchmaking/';
+            url = '/pages/matchmaking/';
             break;
         case 'Friend Battle':
             url = '/friend-battle/';

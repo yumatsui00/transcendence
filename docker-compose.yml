@@ -223,13 +223,34 @@ services:
 
   #---------------------------------------------------------------------
   #---------------------------------------------------------------------
-  redis:
-    image: redis:latest
-    container_name: REDIS
-    ports:
-      - "6379:6379"
+
+  websocket:
+    build:
+      context: srcs/Websocket
+      dockerfile: Dockerfile
+    container_name: websocket
+    volumes:
+      - ./srcs/Websocket:/app
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/websocket:/etc/ssl/certs/websocket
+    depends_on:
+      - redis
     networks:
       - TNet
+
+  redis:
+    build:
+      context: srcs/Redis
+      dockerfile: Dockerfile
+    container_name: REDIS
+    volumes:
+      - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
+      - ./srcs/RootCA/certs/redis:/etc/ssl/certs/redis
+    networks:
+      - TNet
+
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
 
   # dbeaver:
   #   build:

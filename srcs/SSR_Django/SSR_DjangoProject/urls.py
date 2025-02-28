@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import landing_page, signup_page, login_page, get_qr_page, home_view, setting_view
+from .views import landing_page, signup_page, login_page, get_qr_page, home_view, setting_view, matchmaking_page, matchgame_page
 
 
 urlpatterns = [
@@ -25,6 +25,9 @@ urlpatterns = [
     path('get_qr/<str:userid>/<str:qr_url>', get_qr_page, name="qr_page"),
 
     path("home/", home_view, name="home_page"),  # ✅ JWTチェック → `/home/<userid>/` にリダイレクト
-    path("setting/", setting_view, name="setting_page")
+    path("setting/", setting_view, name="setting_page"),
+
+    path('matchmaking/', matchmaking_page, name='matchmaking_page'),
+    path('match-game/<str:room_name>/', matchgame_page, name='matchgame_page'),
 #     path("home/<int:userid>/", home_page_with_userid, name="home_page_with_userid"),
 ]

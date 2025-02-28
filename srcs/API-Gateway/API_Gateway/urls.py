@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path
 from .views import signup_view, login_view, logout_view
-from .SSR_Django.views import landing_page_view, signup_page_view, login_page_view, home_page, setting_page
+from .SSR_Django.views import landing_page_view, signup_page_view, login_page_view, home_page, setting_page, matchmaking_page, matchgame_page
 # from .twoFAService.views import generate_qr_view
 
 urlpatterns = [
@@ -29,4 +29,6 @@ urlpatterns = [
     path('login/', login_page_view, name="login_page"),
     path('pages/home/', home_page, name="home_page"),
     path('pages/setting/', setting_page, name="setting_page"),
+    path('pages/matchmaking/', matchmaking_page, name='matchmaking_page'),
+    path('pages/match-game/<str:room_name>/', matchgame_page, name='matchgame_page'),
 ]
