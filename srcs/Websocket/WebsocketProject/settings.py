@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-#ib1u1ti)wb%(tq*)^j5!=qc5)i750+^u#4bf1*je4-j4k3_e7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["yumatsui.42.fr", "localhost", "127.0.0.1", "websocket", "innerproxy"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "websocket", "innerproxy"]
 
 
 # Application definition
@@ -117,7 +117,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -128,11 +131,41 @@ ASGI_APPLICATION = 'WebsocketProject.asgi.application'
 
 redis_host = os.environ.get('REDIS_HOST', 'localhost')  
 
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
+
+import ssl
+from redis.asyncio.connection import Connection
+from channels_redis.core import RedisChannelLayer
+
+redis_backend_url = "rediss://redis:6379"
+
+ssl_context = ssl.SSLContext()
+ssl_context.load_cert_chain(
+    certfile="/etc/ssl/certs/websocket/websocket.crt",
+    keyfile="/etc/ssl/certs/websocket/websocket.key"
+)
+ssl_context.load_verify_locations(cafile="/etc/ssl/certs/rootCA/custom-ca-bundle.crt")
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [("redis://redis:6379")],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": ({
+                'address': redis_backend_url,
+                'password': REDIS_PASSWORD,
+                'ssl': ssl_context
+            },)
         },
-    },
+    }
+}
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'rediss://redis:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'ssl_context': ssl_context,
+        }
+    }
 }

@@ -24,7 +24,7 @@ export async function checkAuth(authRedirect = null, noAuthRedirect = null) {
     
 
     try {
-        const response = await apiFetch("https://yumatsui.42.fr/authenticator/check_auth/");
+        const response = await apiFetch("https://localhost:8443/authenticator/check_auth/");
 
         if (response.ok) {
             const data = await response.json();

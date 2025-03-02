@@ -2,7 +2,7 @@ import { apiFetch } from "./apiFetch.js";
 
 export async function getUserInfo() {
     try {
-        const response = await apiFetch("https://yumatsui.42.fr/api/userinfo/");
+        const response = await apiFetch("https://localhost:8443/api/userinfo/");
         if (response.ok) {
             const userInfo = await response.json();
             console.log("✅ ユーザー情報取得成功:", userInfo);

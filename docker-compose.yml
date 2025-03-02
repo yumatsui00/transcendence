@@ -194,7 +194,7 @@ services:
       dockerfile: Dockerfile
     container_name: proxy
     ports:
-      - "443:443"
+      - "8443:443"
     depends_on:
       - auth-service
       - 2fa-service
@@ -233,6 +233,8 @@ services:
       - ./srcs/Websocket:/app
       - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
       - ./srcs/RootCA/certs/websocket:/etc/ssl/certs/websocket
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       - redis
     networks:
@@ -246,6 +248,8 @@ services:
     volumes:
       - ./srcs/RootCA/certs/rootCA:/etc/ssl/certs/rootCA
       - ./srcs/RootCA/certs/redis:/etc/ssl/certs/redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       - TNet
 

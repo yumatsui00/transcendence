@@ -1,5 +1,5 @@
 export async function loginflow(email, password, deviceName) {
-    const loginResponse = await fetch("https://yumatsui.42.fr/api/login/", {
+    const loginResponse = await fetch("https://localhost:8443/api/login/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -15,7 +15,7 @@ export async function loginflow(email, password, deviceName) {
             if (loginData.qr_url) {
                 const qrUrlEncoded = btoa(loginData.qr_url);
                 alert("qr_表示用ページへ")
-                window.location.href = `https://yumatsui.42.fr/get_qr/${userid}/${qrUrlEncoded}`
+                window.location.href = `https://localhost:8443/get_qr/${userid}/${qrUrlEncoded}`
             } else {
                 alert("OTPへ")
                 
@@ -25,7 +25,7 @@ export async function loginflow(email, password, deviceName) {
             localStorage.setItem("access_token", loginData.access_token);
             localStorage.setItem("refresh_token", loginData.refresh_token);
             localStorage.setItem("language", loginData.lang);
-            window.location.href = `https://yumatsui.42.fr/pages/home/`
+            window.location.href = `https://localhost:8443/pages/home/`
         }
     } else {
         console.error(loginResponse.message)

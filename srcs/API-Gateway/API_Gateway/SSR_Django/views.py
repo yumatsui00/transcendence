@@ -33,19 +33,19 @@ def landing_page_view(request):
     status, access_token =is_authorized(request)
     if status is False or access_token is None:
         return django_render("https://innerproxy/")
-    return redirect("https://yumatsui.42.fr/pages/home/")
+    return redirect("https://innerproxy/pages/home/")
 
 def signup_page_view(request):
     status, access_token =is_authorized(request)
     if status is False or access_token is None:
         return django_render("https://innerproxy/signup")
-    return redirect("https://yumatsui.42.fr/pages/home/")
+    return redirect("https://innerproxy/pages/home/")
 
 def login_page_view(request):
     status, access_token =is_authorized(request)
     if status is False or access_token is None:
         return django_render("https://innerproxy/login")
-    return redirect("https://yumatsui.42.fr/pages/home/")
+    return redirect("https://innerproxy/pages/home/")
 
 # def auth_render(request, url):
 #     access_token = request.COOKIES.get("access_token")
@@ -61,24 +61,24 @@ def login_page_view(request):
 def home_page(request):
     status, access_token = is_authorized(request)
     if status is False or access_token is None:
-        return redirect("https://yumatsui.42.fr")
+        return redirect("https://localhost:8443")
     return django_render("https://innerproxy/pages/home/")
 
 
 def setting_page(request):
     status, access_token = is_authorized(request)
     if status is False or access_token is None:
-        return redirect("https://yumatsui.42.fr")
+        return redirect("https://localhost:8443")
     return django_render("https://innerproxy/pages/setting/")
 
 def matchmaking_page(request):
     status, access_token = is_authorized(request)
     if status is False or access_token is None:
-        return redirect("https://yumatsui.42.fr")
+        return redirect("https://localhost:8443")
     return django_render("https://innerproxy/pages/matchmaking/")
 
 def matchgame_page(request, room_name):
     status, access_token = is_authorized(request)
     if status is False or access_token is None:
-        return redirect("https://yumatsui.42.fr")
+        return redirect("https://localhost:8443")
     return django_render(f"https://innerproxy/pages/match-game/{room_name}/")

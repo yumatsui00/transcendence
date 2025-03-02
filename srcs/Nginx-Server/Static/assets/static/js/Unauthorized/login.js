@@ -4,7 +4,7 @@ import { loginflow } from "/static/js/utils/loginflow.js";
 import { getDeviceName } from "/static/js/utils/getDeviceName.js";
 
 
-checkAuth("https://yumatsui.42.fr/home/", null);
+checkAuth("https://localhost:8443/home/", null);
 
 const deviceName = getDeviceName();
 const translations = translations_format
