@@ -28,7 +28,7 @@ DOMAIN = os.environ.get("DOMAIN", "localhost") #ない場合はlocalhost
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["django", DOMAIN, "innerproxy"]
+ALLOWED_HOSTS = ["django",'localhost', DOMAIN, "innerproxy"]
 
 
 # Application definition

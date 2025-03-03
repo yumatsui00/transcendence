@@ -39,6 +39,6 @@ window.onload = fetchQRCode;
 document.addEventListener("DOMContentLoaded", () => {
 	document.getElementById("qr-ok-btn").addEventListener("click", () => {
 		// ✅ email と qr_code_url を URL パラメータとして渡す
-		window.location.href = `https://localhost:8443/authenticator/otp/?email=${encodeURIComponent(email)}}`;
+		window.location.href = `${window.location.origin}/authenticator/otp/?email=${encodeURIComponent(email)}}`;
 	});
 });

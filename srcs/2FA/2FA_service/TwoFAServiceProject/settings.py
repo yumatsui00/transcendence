@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@qfuoy_^b03mr#wo2jfh-9j_%y+^o)6hvys99(sd%!)4d9evfg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DOMAIN = os.environ.get("DOMAIN", "localhost") 
-ALLOWED_HOSTS = [DOMAIN, "django", "innerproxy", "2fa-service"]
+ALLOWED_HOSTS = [DOMAIN,'localhost', "django", "innerproxy", "2fa-service"]
 
 # Application definition
 

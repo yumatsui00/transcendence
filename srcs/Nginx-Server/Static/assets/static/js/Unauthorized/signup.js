@@ -19,7 +19,7 @@ async function signupflow(username, email, password, is_2fa_enabled, language, d
         //! email check
 
         console.log("Sending data:", Object.fromEntries(formData.entries())); // 🔍 送信データを確認
-        const response = await fetch("https://localhost:8443/api/signup/", {
+        const response = await fetch(`${window.location.origin}/api/signup/`, {
             method: "POST",
             body: formData
         });
