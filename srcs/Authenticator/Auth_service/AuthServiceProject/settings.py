@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-mu+@*25um6dwx=%m5ykgh&p&dwapiy=(4hyco2_0qnw^)53k10
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DOMAIN = os.environ.get("DOMAIN", "localhost") 
-ALLOWED_HOSTS = [DOMAIN, "django", "innerproxy", "auth-service"]
+ALLOWED_HOSTS = [DOMAIN,'localhost', "django", "innerproxy", "auth-service"]
 
 
 # Application definition

@@ -5,7 +5,7 @@ export async function apiGet(url) {
 
     if (!access_token || !refresh_token) {
         console.error("no token found")
-        window.location.href = `https://yumatsui.42.fr/`
+        window.location.href = `${window.location.origin}`
     }
     let options = {}
     options.headers["Authorization"] = `Bearer ${access_token}`;
@@ -18,7 +18,7 @@ export async function apiGet(url) {
         if (response.status === 401 && refresh_token) {
             console.warn("🔄 Access token expired. Trying refresh token...");
 
-            const refreshResponse = await fetch("https://yumatsui.42.fr/authenticator/refresh/", {
+            const refreshResponse = await fetch(`${window.location.origin}/authenticator/refresh/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refresh: refresh_token })

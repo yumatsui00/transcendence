@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch("https://yumatsui.42.fr/authenticator/verify_otp/", {
+            const response = await fetch(`${window.location.origin}/authenticator/verify_otp/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email, otp: otpCode, device: deviceName }) // ✅ `email` も送信
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("access_token", data.access_token);
                 localStorage.getItem("refresh_token", data.refresh_token);
                 localStorage.setItem("language", data.lang);
-                window.location.href = "https://yumatsui.42.fr/home/";
+                window.location.href = `${window.location.origin}/home/`;
             } else {
                 document.getElementById("otp-message").textContent = data.message || "Invalid OTP.";
             }
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ 「Back to QR Code」ボタンを押したときに email & qr_code_url を URL に含める
     document.getElementById("back-to-qr-btn").addEventListener("click", () => {
-        window.location.href = `https://yumatsui.42.fr/authenticator/qr/?email=${encodeURIComponent(email)}}`;
+        window.location.href = `${window.location.origin}/authenticator/qr/?email=${encodeURIComponent(email)}}`;
     });
 });
 

@@ -28,7 +28,7 @@ DOMAIN = os.environ.get("DOMAIN", "localhost") #ない場合はlocalhost
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["django", DOMAIN, "innerproxy"]
+ALLOWED_HOSTS = ["django",'localhost', DOMAIN, "innerproxy"]
 
 
 # Application definition
@@ -118,6 +118,9 @@ CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 INITDELAUTHINFOPASS = os.environ.get("INITDELAUTHINFOPASS", "password")
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

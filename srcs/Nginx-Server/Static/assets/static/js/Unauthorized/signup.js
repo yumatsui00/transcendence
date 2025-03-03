@@ -19,7 +19,7 @@ async function signupflow(username, email, password, is_2fa_enabled, language, d
         //! email check
 
         console.log("Sending data:", Object.fromEntries(formData.entries())); // 🔍 送信データを確認
-        const response = await fetch("https://yumatsui.42.fr/api/signup/", {
+        const response = await fetch(`${window.location.origin}/api/signup/`, {
             method: "POST",
             body: formData
         });
@@ -36,7 +36,7 @@ async function signupflow(username, email, password, is_2fa_enabled, language, d
     }
 }
 
-// checkAuth("https://yumatsui.42.fr/home/", null);
+// checkAuth("https://localhost:8443/home/", null);
 
 const translations = translations_format
 const lang = localStorage.getItem("selected_language") || 0;

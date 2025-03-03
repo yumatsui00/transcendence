@@ -12,5 +12,10 @@ until [ -f "$certfile" ] && [ -f "$keyfile" ]; do
   echo "Waiting for $certfile and $keyfile to be created..."
   sleep 1
 done
+# 環境変数からパスワードを取得
+REDIS_PASSWORD=${REDIS_PASSWORD:-defaultpassword}
+
+# redis.confファイルにパスワードを設定
+sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
 
 exec redis-server /etc/redis/redis.conf

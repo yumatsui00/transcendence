@@ -52,8 +52,10 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 256px;
-    color: #ff0000;
+    color: #df9400;
+    text-shadow: 0 -2px 2px #fff, 3px 3px 3px #000;
     display: none;
+    -webkit-text-stroke: 1px #000;
 }
 
 .hidden {

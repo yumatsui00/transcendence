@@ -17,13 +17,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function startCountdown() {
         let countdown = 3;
         countdownElement.style.display = 'block';
-        countdownElement.innerHTML = countdown;
+        countdownElement.innerHTML = 'READY';
 
         const countdownInterval = setInterval(() => {
             countdown -= 1;
-            if (countdown > 0) {
-                countdownElement.innerHTML = countdown;
-            } else {
+            if (countdown = 0) {
                 clearInterval(countdownInterval);
                 countdownElement.style.display = 'none';
                 startWebSocketConnection();

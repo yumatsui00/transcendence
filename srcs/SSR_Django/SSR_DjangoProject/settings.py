@@ -32,7 +32,7 @@ DOMAIN = os.environ.get("DOMAIN", "localhost") #ない場合はlocalhost
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["django", DOMAIN, "innerproxy"]
+ALLOWED_HOSTS = ["django",'localhost', DOMAIN, "innerproxy"]
 
 
 # Application definition
@@ -107,9 +107,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 
-STATIC_URL = f"https://{DOMAIN}/static/"
-MEDIA_URL = f"https://{DOMAIN}/media/"
-STATICFILES_DIRS = [] 
+# STATIC_URL = f"https://{DOMAIN}/static/"
+# MEDIA_URL = f"https://{DOMAIN}/media/"
+# STATICFILES_DIRS = [] 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 CERT_PATH = "/etc/ssl/certs/rootCA/custom-ca-bundle.crt"
 # Default primary key field type

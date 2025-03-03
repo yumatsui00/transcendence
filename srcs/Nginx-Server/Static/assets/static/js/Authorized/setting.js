@@ -44,14 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ ログアウト処理
     signOutBtn.addEventListener("click", async function () {
         try {
-            const logoutResponse = await fetch("https://yumatsui.42.fr/api/logout/", {
+            const logoutResponse = await fetch(`${window.location.origin}/api/logout/`, {
                 method: "POST",  // ✅ ログアウトは `POST` のほうが適切
                 credentials: "include"  // ✅ クッキーを含める（重要）
             });
 
             if (logoutResponse.ok) {
                 alert("Logged out successfully!");
-                window.location.href = "https://yumatsui.42.fr";  // ✅ ルートページへリダイレクト
+                window.location.href = `${window.location.origin}`;  // ✅ ルートページへリダイレクト
             } else {
                 alert("Logout failed! Please try again.");
             }
