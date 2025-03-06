@@ -19,7 +19,7 @@ canvas {
     background-color: white;
 }
 
-#score-container {
+/* #score-container {
     position: absolute;
     top: 10px;
     width: 100%;
@@ -42,20 +42,64 @@ canvas {
 }
 
 .player-score {
-    font-size: 96px;
+    font-size: 144px;
+} */
+
+
+/*score*/
+#score-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 400px;
+    height: 300px;
+    background-color: rgba(255, 255, 255, 0.5); /* 半透明の白 */
+    border-radius: 15px; /* 角を丸くする */
+    display: flex;
 }
 
+#score-board {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#score-player1 {
+    color: rgb(255, 0, 0);
+    font-size: 144px;
+    text-shadow: 2px 2px 2px #000;
+    text-shadow: 2px 2px 2px #000;
+    font-family: "Trade Winds", system-ui;
+}
+
+#score-player2 {
+    color: rgb(0, 0, 255);
+    font-size: 144px;
+    text-shadow: 2px 2px 2px #000;
+    text-shadow: 2px 2px 2px #000;
+    font-family: "Trade Winds", system-ui;
+}
+
+.score-bar {
+    color: #fff;
+    font-size: 144px;
+    text-shadow: 2px 2px 2px #000;
+    text-shadow: 2px 2px 2px #000;
+    font-family: "Trade Winds", system-ui;
+}
 
 #countdown {
     position: absolute;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 256px;
-    color: #df9400;
-    text-shadow: 0 -2px 2px #fff, 3px 3px 3px #000;
+    font-size: 96px;
+    color: #d40000;
+    text-shadow: 2px 2px 2px #000;
+    font-family: "Yuji Syuku", serif;
+    font-weight: 400;
+    font-style: normal;
     display: none;
-    -webkit-text-stroke: 1px #000;
 }
 
 .hidden {
