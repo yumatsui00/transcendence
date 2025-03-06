@@ -12,12 +12,15 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="{% static 'js/Authorized/match-game.js' %}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Trade+Winds&family=Yuji+Syuku&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="gameContainer">
-        <div id="countdown">3</div>
+        <div id="countdown">READY</div>
         <div id="message" class="hidden"></div>
-        <div id="score-container">
+        <!-- <div id="score-container">
             <div id="score-player1" class="score-box">
                 <span class="player-label">Player 1</span>
                 <span class="player-score">0</span>
@@ -25,6 +28,13 @@
             <div id="score-player2" class="score-box">
                 <span class="player-label">Player 2</span>
                 <span class="player-score">0</span>
+            </div>
+        </div> -->
+        <div id="score-container">
+            <div id="score-board">
+                <span id="score-player1">0</span>
+                <span class="score-bar">-</span>
+                <span id="score-player2">0</span>
             </div>
         </div>
         <canvas id="gameCanvas"></canvas>

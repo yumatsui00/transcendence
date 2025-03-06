@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     console.log(`WebSocket URL: ${url}`);
     let playerRole = null;
     const countdownElement = document.getElementById('countdown');
-    const scorePlayer1Element = document.querySelector('#score-player1 .player-score');
-    const scorePlayer2Element = document.querySelector('#score-player2 .player-score');
+    const scorePlayer1Element = document.querySelector('score-player1');
+    const scorePlayer2Element = document.querySelector('score-player2');
     const GAME_IN_PROGRESS = 'in_progress';
     const PLAYER1_WINS = 'player1_wins';
     const PLAYER2_WINS = 'player2_wins';
@@ -14,19 +14,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
     // 開始のカウントダウン
-    function startCountdown() {
+    function gameStart() {
         let countdown = 3;
         countdownElement.style.display = 'block';
-        countdownElement.innerHTML = 'READY';
+        countdownElement.innerHTML = '心頭滅却すれば火もまた涼し';
 
-        const countdownInterval = setInterval(() => {
-            countdown -= 1;
-            if (countdown = 0) {
-                clearInterval(countdownInterval);
-                countdownElement.style.display = 'none';
-                startWebSocketConnection();
-            }
-        }, 1000);
+        // const countdownInterval = setInterval(() => { 
+        //     countdown -= 1;
+        //     if (countdown == 0) {
+        //         clearInterval(countdownInterval);
+        //         countdownElement.style.display = 'none';
+        //         startWebSocketConnection();
+        //     }
+        // }, 1000);
     }
 
     function startWebSocketConnection() {
@@ -303,6 +303,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         renderer.render(scene, camera);
     }
     animate();
-    startCountdown();
+    gameStart();
 });
 
